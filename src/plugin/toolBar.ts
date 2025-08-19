@@ -6,6 +6,7 @@ import full from '../icons/full.svg?raw'
 import living from '../icons/living.svg?raw'
 import zoomin from '../icons/zoomin.svg?raw'
 import zoomout from '../icons/zoomout.svg?raw'
+import folderopen from '../icons/folder-open.svg?raw'
 
 import './toolBar.less'
 
@@ -17,6 +18,7 @@ const map: Record<string, string> = {
   living,
   zoomin,
   zoomout,
+  folderopen,
 }
 const createButton = (id: string, name: string) => {
   const button = document.createElement('span')
@@ -62,10 +64,12 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
   const l = createButton('tbltl', 'left')
   const r = createButton('tbltr', 'right')
   const s = createButton('tblts', 'side')
+  const openFile = createButton('openfile', 'folderopen')
 
   toolBarLTContainer.appendChild(l)
   toolBarLTContainer.appendChild(r)
   toolBarLTContainer.appendChild(s)
+  toolBarLTContainer.appendChild(openFile)
   toolBarLTContainer.className = 'mind-elixir-toolbar lt'
   l.onclick = () => {
     mind.initLeft()
@@ -75,6 +79,26 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
   }
   s.onclick = () => {
     mind.initSide()
+  }
+  openFile.onclick = () => {
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.accept = '.json'
+    fileInput.style.display = 'none'
+    
+    fileInput.onchange = (event) => {
+      const target = event.target as HTMLInputElement
+      const file = target.files?.[0]
+      
+      if (!file) return
+      
+      // File handling will be implemented in Phase 2
+      console.log('File selected:', file.name)
+    }
+    
+    document.body.appendChild(fileInput)
+    fileInput.click()
+    document.body.removeChild(fileInput)
   }
   return toolBarLTContainer
 }

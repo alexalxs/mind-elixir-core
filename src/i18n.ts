@@ -11,6 +11,7 @@ type LangPack = {
   linkBidirectional: string
   clickTips: string
   summary: string
+  openFile: string
 }
 
 /**
@@ -30,6 +31,7 @@ const cn = {
   linkBidirectional: '双向连接',
   clickTips: '请点击目标节点',
   summary: '摘要',
+  openFile: '打开文件',
 }
 const i18n: Record<Locale, LangPack> = {
   cn,
@@ -47,6 +49,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: '雙向連接',
     clickTips: '請點擊目標節點',
     summary: '摘要',
+    openFile: '開啟檔案',
   },
   en: {
     addChild: 'Add child',
@@ -61,6 +64,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: 'Bidirectional Link',
     clickTips: 'Please click the target node',
     summary: 'Summary',
+    openFile: 'Open File',
   },
   ru: {
     addChild: 'Добавить дочерний элемент',
@@ -75,6 +79,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: 'Двунаправленная ссылка',
     clickTips: 'Пожалуйста, нажмите на целевой узел',
     summary: 'Описание',
+    openFile: 'Открыть файл',
   },
   ja: {
     addChild: '子ノードを追加する',
@@ -89,6 +94,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: '双方向リンク',
     clickTips: 'ターゲットノードをクリックしてください',
     summary: '概要',
+    openFile: 'ファイルを開く',
   },
   pt: {
     addChild: 'Adicionar item filho',
@@ -103,6 +109,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: 'Link bidirecional',
     clickTips: 'Favor clicar no item alvo',
     summary: 'Resumo',
+    openFile: 'Abrir Arquivo',
   },
   it: {
     addChild: 'Aggiungi figlio',
@@ -117,6 +124,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: 'Collegamento bidirezionale',
     clickTips: 'Si prega di fare clic sul nodo di destinazione',
     summary: 'Unisci nodi',
+    openFile: 'Apri File',
   },
   es: {
     addChild: 'Agregar hijo',
@@ -131,6 +139,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: 'Enlace bidireccional',
     clickTips: 'Por favor haga clic en el nodo de destino',
     summary: 'Resumen',
+    openFile: 'Abrir Archivo',
   },
   fr: {
     addChild: 'Ajout enfant',
@@ -145,6 +154,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: 'Lien bidirectionnel',
     clickTips: 'Cliquer sur le noeud cible',
     summary: 'Annoter',
+    openFile: 'Ouvrir Fichier',
   },
   ko: {
     addChild: '자식 추가',
@@ -159,6 +169,7 @@ const i18n: Record<Locale, LangPack> = {
     linkBidirectional: '양방향 연결',
     clickTips: '대상 노드를 클릭하십시오',
     summary: '요약',
+    openFile: '파일 열기',
   },
 }
 
