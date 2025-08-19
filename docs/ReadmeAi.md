@@ -10,7 +10,7 @@
 . Analise de forma independente e do zero o código do projeto;
 
 - Quando solicitado a fazer um ToDo: Crie dentro da pasta /Docs um arquivo md com o prefixo do componente como por exemplo AuthContextToDo.md. 
-. Nele deve ter, de forma muito resumida e em tópicos o que o componente ou função faz da seguinte forma:
+. Nele deve ter, de forma muito resumida e em tópicos o que o componente ou função faz da seguinte forma se for pedido por grupo de recursos:
 - Grupo de recurso:
 [ ] recurso;
 [ ] recurso;
@@ -18,6 +18,16 @@
 [ ] recurso;
 [ ] recurso;
 O Grupo de recursos são baseados em critérios como design, funcionalidade, integrações e etc. 
+
+. Nele deve ter, de forma muito resumida e em tópicos o que o componente ou função faz da seguinte forma se for pedido por fases:
+- fase 1:
+[ ] recurso;
+[ ] recurso;
+- fase 2:
+[ ] recurso;
+[ ] recurso;
+As fases se organizam de forma lógica para implementar uma funcionalidade maior.
+
 
 
 - Quando solicitado a criar ou modificar o código:
