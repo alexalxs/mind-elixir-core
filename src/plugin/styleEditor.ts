@@ -41,13 +41,13 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     editor.innerHTML = `
       <div class="style-editor-header">
         <div class="style-editor-tabs">
-          <button class="tab-btn active" data-tab="format">Format</button>
-          <button class="tab-btn" data-tab="content">Content</button>
+          <button class="tab-btn active" data-tab="text">Texto</button>
+          <button class="tab-btn" data-tab="content">Conteúdo</button>
         </div>
         <button class="close-btn">&times;</button>
       </div>
       <div class="style-editor-content">
-        <div class="tab-content active" data-content="format">
+        <div class="tab-content active" data-content="text">
           <div class="font-family-row">
             ${fontFamilies
               .map(
@@ -66,7 +66,7 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
             <button class="style-btn size-btn size-up" data-action="size-up">A</button>
           </div>
           <div class="color-section">
-            <div class="color-label">Text Color</div>
+            <div class="color-label">Cor do Texto</div>
             <div class="color-palette">
               ${colors
                 .map(
@@ -77,7 +77,7 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
             </div>
           </div>
           <div class="color-section">
-            <div class="color-label">Background Color</div>
+            <div class="color-label">Cor de Fundo</div>
             <div class="color-palette">
               ${colors
                 .map(
@@ -89,26 +89,48 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
           </div>
           <div class="additional-styles">
             <div class="style-group">
-              <label>Border</label>
-              <input type="text" class="style-input" data-property="border" placeholder="e.g., 2px solid red">
+              <label>Tamanho da Fonte</label>
+              <input type="text" class="style-input" data-property="fontSize" placeholder="e.g., 16px">
             </div>
             <div class="style-group">
-              <label>Width</label>
-              <input type="text" class="style-input" data-property="width" placeholder="e.g., 200px">
+              <label>Borda</label>
+              <select class="style-select" data-property="border">
+                <option value="">Nenhuma</option>
+                <option value="1px solid #ccc">Fina cinza</option>
+                <option value="2px solid #666">Média cinza</option>
+                <option value="3px solid #333">Grossa cinza</option>
+                <option value="1px solid #0066ff">Fina azul</option>
+                <option value="2px solid #0066ff">Média azul</option>
+                <option value="1px dashed #666">Tracejada</option>
+                <option value="1px dotted #666">Pontilhada</option>
+              </select>
             </div>
             <div class="style-group">
-              <label>Text Decoration</label>
+              <label>Largura</label>
+              <select class="style-select" data-property="width">
+                <option value="">Automática</option>
+                <option value="100px">100px</option>
+                <option value="150px">150px</option>
+                <option value="200px">200px</option>
+                <option value="250px">250px</option>
+                <option value="300px">300px</option>
+                <option value="400px">400px</option>
+                <option value="500px">500px</option>
+              </select>
+            </div>
+            <div class="style-group">
+              <label>Decoração do Texto</label>
               <select class="style-select" data-property="textDecoration">
-                <option value="none">None</option>
-                <option value="underline">Underline</option>
-                <option value="overline">Overline</option>
-                <option value="line-through">Line Through</option>
+                <option value="none">Nenhuma</option>
+                <option value="underline">Sublinhado</option>
+                <option value="overline">Linha acima</option>
+                <option value="line-through">Riscado</option>
               </select>
             </div>
           </div>
         </div>
         <div class="tab-content" data-content="content">
-          <div class="content-placeholder">Content editing coming soon...</div>
+          <div class="content-placeholder">Editor de conteúdo HTML (em breve)...</div>
         </div>
       </div>
     `
@@ -288,11 +310,14 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     }
     
     // Update input fields
-    const borderInput = editorEl.querySelector('[data-property="border"]') as HTMLInputElement
-    if (borderInput) borderInput.value = nodeObj.style?.border || ''
+    const fontSizeInput = editorEl.querySelector('[data-property="fontSize"]') as HTMLInputElement
+    if (fontSizeInput) fontSizeInput.value = nodeObj.style?.fontSize || ''
     
-    const widthInput = editorEl.querySelector('[data-property="width"]') as HTMLInputElement
-    if (widthInput) widthInput.value = nodeObj.style?.width || ''
+    const borderSelect = editorEl.querySelector('[data-property="border"]') as HTMLSelectElement
+    if (borderSelect) borderSelect.value = nodeObj.style?.border || ''
+    
+    const widthSelect = editorEl.querySelector('[data-property="width"]') as HTMLSelectElement
+    if (widthSelect) widthSelect.value = nodeObj.style?.width || ''
     
     const textDecorationSelect = editorEl.querySelector('[data-property="textDecoration"]') as HTMLSelectElement
     if (textDecorationSelect) textDecorationSelect.value = nodeObj.style?.textDecoration || 'none'
