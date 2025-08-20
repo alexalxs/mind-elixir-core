@@ -18,7 +18,7 @@ interface RequestPayload {
     [key: string]: any
   }
   selectedNodeId: string
-  mode: 'expand' | 'suggest' | 'summarize' | 'question' | 'custom'
+  mode: 'expand' | 'question' | 'custom'
   customPrompt?: string
   depth?: number
 }
@@ -62,9 +62,7 @@ IMPORTANTE: Não sugira tópicos que já existem no mapa mental.
 
   const prompts: Record<string, string> = {
     expand: `${context}\nExpanda o tópico "${selectedNode.topic}" em ${depth} subtópicos relevantes e únicos. Responda apenas com a lista numerada, um item por linha.`,
-    suggest: `${context}\nSugira ${depth} ideias relacionadas a "${selectedNode.topic}" que ainda não existem no mapa. Responda apenas com a lista numerada, um item por linha.`,
-    summarize: `${context}\nCrie um resumo conciso do ramo "${selectedNode.topic}" considerando seus subtópicos.`,
-    question: `${context}\nGere ${depth} perguntas exploratórias sobre "${selectedNode.topic}" para aprofundar o conhecimento. Responda apenas com a lista numerada, uma pergunta por linha.`,
+    question: `${context}\nGere ${depth} perguntas exploratórias sobre "${selectedNode.topic}" com suas respectivas respostas.\nPara cada pergunta, formate a resposta como:\nQ: [pergunta]\nA: [resposta concisa]\n\nSepare cada par pergunta-resposta com uma linha em branco.`,
     custom: customPrompt ? `${context}\n${customPrompt}` : ''
   }
 
@@ -136,32 +134,100 @@ serve(async (req) => {
     const openaiData = await openaiResponse.json()
     const content = openaiData.choices[0]?.message?.content || ''
 
-    // Processar resposta em lista de sugestões
-    let suggestions: string[] = []
+    // Processar resposta em estrutura de nós
+    interface ResponseNode {
+      topic: string
+      aiGenerated: boolean
+      children?: ResponseNode[]
+    }
     
-    if (mode === 'expand' || mode === 'suggest' || mode === 'question') {
-      suggestions = content
+    let children: ResponseNode[] = []
+    
+    if (mode === 'expand') {
+      const suggestions = content
         .split('\n')
         .filter(line => line.trim())
         .map(line => line.replace(/^\d+\.\s*|-\s*/, '').trim())
         .filter(suggestion => suggestion.length > 0)
         .slice(0, depth)
+      
+      // Filtrar sugestões que já existem
+      const filteredSuggestions = suggestions.filter(suggestion => {
+        const suggestionLower = suggestion.toLowerCase()
+        return !Array.from(allTopics).some(topic => 
+          topic.toLowerCase() === suggestionLower
+        )
+      })
+      
+      children = filteredSuggestions.map(topic => ({
+        topic,
+        aiGenerated: true
+      }))
+    } else if (mode === 'question') {
+      // Parse Q&A format
+      const qaBlocks = content.split('\n\n').filter(block => block.trim())
+      
+      for (const block of qaBlocks) {
+        const lines = block.split('\n').filter(line => line.trim())
+        let question = ''
+        let answer = ''
+        
+        for (const line of lines) {
+          if (line.startsWith('Q:')) {
+            question = line.substring(2).trim()
+          } else if (line.startsWith('A:')) {
+            answer = line.substring(2).trim()
+          }
+        }
+        
+        if (question && answer) {
+          // Check if question already exists
+          const questionLower = question.toLowerCase()
+          if (!Array.from(allTopics).some(topic => topic.toLowerCase() === questionLower)) {
+            children.push({
+              topic: question,
+              aiGenerated: true,
+              children: [{
+                topic: answer,
+                aiGenerated: true
+              }]
+            })
+          }
+        }
+      }
+      
+      // Limit to requested depth
+      children = children.slice(0, depth)
     } else {
-      // Para resumo ou custom, retornar como texto único
-      suggestions = [content.trim()]
+      // Custom mode
+      let suggestions: string[] = []
+      if (content.includes('\n')) {
+        suggestions = content
+          .split('\n')
+          .filter(line => line.trim())
+          .map(line => line.replace(/^\d+\.\s*|-\s*/, '').trim())
+          .filter(suggestion => suggestion.length > 0)
+      } else {
+        suggestions = [content.trim()]
+      }
+      
+      // Filtrar sugestões que já existem
+      const filteredSuggestions = suggestions.filter(suggestion => {
+        const suggestionLower = suggestion.toLowerCase()
+        return !Array.from(allTopics).some(topic => 
+          topic.toLowerCase() === suggestionLower
+        )
+      })
+      
+      children = filteredSuggestions.map(topic => ({
+        topic,
+        aiGenerated: true
+      }))
     }
-
-    // Filtrar sugestões que já existem (case insensitive)
-    const filteredSuggestions = suggestions.filter(suggestion => {
-      const suggestionLower = suggestion.toLowerCase()
-      return !Array.from(allTopics).some(topic => 
-        topic.toLowerCase() === suggestionLower
-      )
-    })
 
     return new Response(
       JSON.stringify({ 
-        suggestions: filteredSuggestions,
+        children,
         mode,
         selectedNodeTopic: selectedNode.topic
       }),

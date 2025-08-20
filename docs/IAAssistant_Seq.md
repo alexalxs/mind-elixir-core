@@ -1,4 +1,4 @@
-# Diagrama de Sequência - IA Assistant (Simplificado)
+# Diagrama de Sequência - IA Assistant
 
 ## Fluxo Simplificado com Supabase Edge Functions
 
@@ -19,19 +19,22 @@ sequenceDiagram
     Note over EF: Valida entrada<br/>Analisa contexto completo<br/>Identifica conteúdo existente
     
     EF->>OAI: POST /completions<br/>{prompt: "Contexto: [mapa mental completo]<br/>Expanda o nó 'Marketing'<br/>evitando duplicar tópicos existentes"}
-    OAI-->>EF: {suggestions: ["SEO", "Redes Sociais"...]}
+    OAI-->>EF: {content: "1. SEO\n2. Redes Sociais..."}
     Note over OAI: IA analisa contexto completo<br/>e sugere apenas tópicos novos
     
-    EF-->>ME: {suggestions: [...]}
-    ME->>ME: showModal(suggestions)
+    EF-->>ME: {<br/>  children: [<br/>    {topic: "SEO", aiGenerated: true},<br/>    {topic: "Redes Sociais", aiGenerated: true}<br/>  ]<br/>}
+    Note over ME: Resposta já contém estrutura<br/>de nós pronta para adicionar
     
-    User->>ME: Seleciona 3 sugestões
-    ME->>ME: addChild("SEO")
-    ME->>ME: addChild("Redes Sociais")
-    ME->>ME: addChild("Email Marketing")
+    ME->>ME: addAINodes(currentNode, children)
+    loop Para cada nó filho
+        ME->>ME: generateNewObj()
+        ME->>ME: addChild(parent, newNode)
+        ME->>ME: Adiciona badge 🤖
+    end
     ME->>ME: linkDiv.refresh()
     
-    ME-->>User: Atualiza visualização
+    ME->>ME: Mostra mensagem de sucesso
+    ME-->>User: Atualiza visualização automaticamente
 ```
 
 ## Fluxo de Implementação MVP
@@ -82,7 +85,6 @@ sequenceDiagram
     participant ME as MindElixir
     participant IAM as IAManager
     participant API as IA API
-    participant DB as LocalStorage
     participant DOM as DOM/SVG
 
     User->>UI: Seleciona nó "Marketing Digital"
@@ -95,39 +97,31 @@ sequenceDiagram
     DOM-->>User: Mostra painel com opções
     
     User->>IAM: Seleciona modo "Expandir"
+    User->>IAM: Clica botão "Gerar"
     IAM->>ME: mind.getData()
     ME-->>IAM: JSON completo do mapa mental
-    IAM->>IAM: buildPrompt(mode: "expand", fullMap: mapData, selectedId: "n123")
-    Note over IAM: Prepara contexto com:<br/>- Mapa mental completo<br/>- ID do nó selecionado<br/>- Todos os tópicos existentes<br/>- Profundidade desejada
+    IAM->>IAM: cleanNodeData(nodeData)
+    Note over IAM: Remove referências circulares<br/>para evitar erro de JSON
     
-    IAM->>API: POST /completions<br/>{<br/>  mindMap: {...},<br/>  selectedNodeId: "n123",<br/>  mode: "expand"<br/>}
-    API-->>IAM: Response {suggestions: [...]}
-    Note over API: Retorna sugestões contextualizadas:<br/>Evita duplicar "Email Marketing"<br/>que já existe em outro ramo
+    IAM->>API: POST /ai-assistant<br/>{<br/>  mindMap: {...},<br/>  selectedNodeId: "n123",<br/>  mode: "expand"<br/>}
+    API-->>IAM: Response {<br/>  children: [<br/>    {topic: "SEO", aiGenerated: true},<br/>    {topic: "Redes Sociais", aiGenerated: true},<br/>    {topic: "Analytics", aiGenerated: true}<br/>  ]<br/>}
+    Note over API: Retorna estrutura de nós<br/>pronta para adicionar<br/>Evita duplicar tópicos existentes
     
-    IAM->>DB: saveHistory(nodeId, suggestions)
-    DB-->>IAM: {success: true}
+    IAM->>IAM: addAINodes(currentNode, children)
+    loop Para cada nó filho
+        IAM->>ME: mind.generateNewObj()
+        ME-->>IAM: newNode
+        IAM->>IAM: newNode.topic = child.topic<br/>newNode.aiGenerated = true<br/>newNode.aiGeneratedAt = ISO timestamp
+        IAM->>ME: mind.addChild(parentEl, newNode)
+        IAM->>DOM: Adiciona classe 'ai-generated-node'
+        IAM->>DOM: Adiciona badge 🤖
+    end
     
-    IAM->>DOM: renderSuggestions(suggestions)
-    DOM-->>User: Mostra preview das sugestões
-    
-    User->>IAM: selectSuggestions([0,1,3])
-    IAM->>ME: mind.addChild(parentId, {topic: "SEO"})
-    ME->>ME: generateNewObj()
-    ME->>ME: nodeData.children.push(newNode)
     ME->>DOM: linkDiv.refresh()
     DOM-->>User: Atualiza visualização
     
-    IAM->>ME: mind.addChild(parentId, {topic: "Marketing de Conteúdo"})
-    ME->>DOM: linkDiv.refresh()
-    
-    IAM->>ME: mind.addChild(parentId, {topic: "Email Marketing"})
-    ME->>DOM: linkDiv.refresh()
-    
-    IAM->>DOM: addIAIndicator(nodeId)
-    DOM-->>User: Mostra ícone IA no nó pai
-    
-    IAM->>ME: mind.bus.fire('iaExpansion', {parent, children})
-    ME-->>IAM: Event dispatched
+    IAM->>DOM: showSuccessMessage("3 nós foram adicionados")
+    DOM-->>User: ✅ 3 nós foram adicionados com sucesso!
 ```
 
 ## Fluxo de Configuração e Inicialização
@@ -199,6 +193,44 @@ sequenceDiagram
     ME->>ME: mind.bus.fire('operation', {name: 'iaCustomExpansion'})
 ```
 
+## Fluxo do Modo Question (Perguntas com Respostas)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant IAP as IA Panel
+    participant IAM as IAManager
+    participant API as IA API
+    participant ME as MindElixir
+
+    User->>IAP: Seleciona modo "Perguntas"
+    User->>IAP: Define número de perguntas (ex: 3)
+    IAP->>IAM: generateQuestions(selectedNode, count=3)
+    
+    IAM->>API: POST /ai-assistant<br/>{<br/>  mode: "question",<br/>  selectedNodeId: "n123",<br/>  depth: 3<br/>}
+    
+    Note over API: Gera perguntas e respostas<br/>sobre o tópico selecionado
+    
+    API-->>IAM: Response {<br/>  questionsWithAnswers: [<br/>    {<br/>      question: "O que é Marketing Digital?",<br/>      answer: "É o conjunto de estratégias...",<br/>    },<br/>    {<br/>      question: "Quais são os principais canais?",<br/>      answer: "Os principais canais incluem...",<br/>    },<br/>    {<br/>      question: "Como medir o ROI?",<br/>      answer: "O ROI pode ser medido através...",<br/>    }<br/>  ]<br/>}
+    
+    IAM->>IAP: displayQuestionsWithAnswers(questionsWithAnswers)
+    User->>IAP: selectQuestions([0, 2])
+    
+    IAP->>IAM: applyQuestionsWithAnswers(selected)
+    
+    loop Para cada pergunta selecionada
+        Note over IAM: Cria estrutura pai-filho
+        IAM->>ME: addChild(parentId, {<br/>  topic: question,<br/>  aiGenerated: true<br/>})
+        ME-->>IAM: questionNode
+        
+        IAM->>ME: addChild(questionNode.id, {<br/>  topic: answer,<br/>  aiGenerated: true<br/>})
+        
+        ME->>DOM: linkDiv.refresh()
+    end
+    
+    Note over ME: Estrutura resultante:<br/>Marketing Digital<br/>├── O que é Marketing Digital? 🤖<br/>│   └── É o conjunto de estratégias... 🤖<br/>└── Como medir o ROI? 🤖<br/>    └── O ROI pode ser medido através... 🤖
+```
+
 ## Estados e Transições
 
 ```mermaid
@@ -211,16 +243,22 @@ stateDiagram-v2
     IAMenuOpen --> ModeSelected: Escolhe modo
     ModeSelected --> Processing: Envia requisição
     
-    Processing --> SuggestionsReady: API responde
+    Processing --> SuggestionsReady: API responde (expand/custom)
+    Processing --> QuestionsReady: API responde (question)
     Processing --> Error: Falha na API
     
     SuggestionsReady --> Editing: Usuário edita
     SuggestionsReady --> Applying: Aceita sugestões
     
+    QuestionsReady --> SelectingQuestions: Usuário seleciona perguntas
+    SelectingQuestions --> ApplyingQuestions: Confirma seleção
+    
     Editing --> Applying: Confirma edições
     Applying --> NodesCreated: Adiciona ao mapa
+    ApplyingQuestions --> NodesWithAnswersCreated: Adiciona perguntas e respostas
     
     NodesCreated --> Idle: Completo
+    NodesWithAnswersCreated --> Idle: Completo com estrutura Q&A
     Error --> IAMenuOpen: Retry
     
     IAMenuOpen --> Idle: Cancela

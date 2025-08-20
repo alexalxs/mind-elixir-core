@@ -13,8 +13,6 @@ export interface AIAssistantOptions {
 
 const AI_MODES: AIMode[] = [
   { id: 'expand', label: 'Expandir', icon: '🌱', description: 'Expandir com subtópicos' },
-  { id: 'suggest', label: 'Sugerir', icon: '💡', description: 'Sugerir ideias relacionadas' },
-  { id: 'summarize', label: 'Resumir', icon: '📝', description: 'Resumir o ramo' },
   { id: 'question', label: 'Perguntas', icon: '❓', description: 'Gerar perguntas exploratórias' },
   { id: 'custom', label: 'Personalizado', icon: '✨', description: 'Prompt personalizado' }
 ]
@@ -128,6 +126,32 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     e.stopPropagation()
   })
 
+  // Helper function to remove circular references
+  function cleanNodeData(node: NodeObj): any {
+    const cleaned: any = {
+      id: node.id,
+      topic: node.topic,
+      expanded: node.expanded,
+      direction: node.direction,
+      style: node.style,
+      tags: node.tags,
+      icons: node.icons,
+      hyperLink: node.hyperLink,
+      image: node.image
+    }
+    
+    // Add root property for the root node
+    if (node.id === mind.nodeData.id) {
+      cleaned.root = true
+    }
+    
+    if (node.children && node.children.length > 0) {
+      cleaned.children = node.children.map(child => cleanNodeData(child))
+    }
+    
+    return cleaned
+  }
+
   // AI API functions
   async function callAIAssistant(payload: any) {
     const response = await fetch(`${supabaseUrl}/functions/v1/ai-assistant`, {
@@ -148,6 +172,54 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     return response.json()
   }
 
+  // Helper function to add AI-generated nodes recursively
+  function addAINodes(parentNode: NodeObj, children: any[]) {
+    // Ensure parent is expanded and has children array
+    if (!parentNode.children) {
+      parentNode.children = []
+    }
+    // Mark parent as expanded to allow collapse/expand
+    parentNode.expanded = true
+    
+    children.forEach(child => {
+      // Create new node with AI-generated flag
+      const newNode = mind.generateNewObj() as AINodeObj
+      newNode.topic = child.topic
+      newNode.aiGenerated = true
+      newNode.aiGeneratedAt = new Date().toISOString()
+      newNode.parent = parentNode
+      
+      // Add the node to parent
+      parentNode.children!.push(newNode)
+      
+      // Recursively add children (for Q&A mode)
+      if (child.children && child.children.length > 0) {
+        addAINodes(newNode, child.children)
+      }
+    })
+  }
+  
+  // Helper function to add visual indicators after refresh
+  function addVisualIndicators(node: NodeObj) {
+    const nodeEl = mind.findEle(node.id)
+    if (nodeEl && (node as AINodeObj).aiGenerated) {
+      nodeEl.classList.add('ai-generated-node')
+      // Add AI badge if not already present
+      if (!nodeEl.querySelector('.ai-badge')) {
+        const aiBadge = document.createElement('span')
+        aiBadge.className = 'ai-badge'
+        aiBadge.innerHTML = '🤖'
+        aiBadge.title = 'AI Generated'
+        nodeEl.appendChild(aiBadge)
+      }
+    }
+    
+    // Process children
+    if (node.children) {
+      node.children.forEach(child => addVisualIndicators(child))
+    }
+  }
+
   async function generateSuggestions() {
     if (!currentNode) return
 
@@ -157,8 +229,11 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     generateBtn.disabled = true
 
     try {
+      // Clean the node data to remove circular references
+      const cleanedNodeData = cleanNodeData(mind.nodeData)
+      
       const payload: AIAssistantPayload = {
-        mindMap: { nodeData: mind.nodeData },
+        mindMap: { nodeData: cleanedNodeData },
         selectedNodeId: currentNode.id,
         mode: selectedMode,
         depth: maxSuggestions
@@ -170,53 +245,32 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
 
       const result = await callAIAssistant(payload)
       
-      // Display suggestions
-      if (result.suggestions && result.suggestions.length > 0) {
-        result.suggestions.forEach((suggestion: string, index: number) => {
-          const suggestionItem = document.createElement('div')
-          suggestionItem.className = 'ai-suggestion-item'
-          suggestionItem.innerHTML = `
-            <span class="ai-suggestion-text">${suggestion}</span>
-            <button class="ai-suggestion-add" title="Adicionar como filho">+</button>
-          `
-          
-          const addBtn = suggestionItem.querySelector('.ai-suggestion-add') as HTMLButtonElement
-          addBtn.addEventListener('click', () => {
-            if (currentNode) {
-              // Create new node with AI-generated flag
-              const newNode = mind.generateNewObj() as AINodeObj
-              newNode.topic = suggestion
-              newNode.aiGenerated = true // Mark as AI-generated
-              newNode.aiGeneratedAt = new Date().toISOString()
-              newNode.aiMode = selectedMode
-              
-              // Find the current node's topic element
-              const currentNodeEl = mind.findEle(currentNode.id) as Topic
-              if (currentNodeEl) {
-                // Add the node
-                mind.addChild(currentNodeEl, newNode)
-              }
-              
-              // Add visual indicator
-              const newNodeEl = mind.findEle(newNode.id)
-              if (newNodeEl) {
-                newNodeEl.classList.add('ai-generated-node')
-                // Add AI badge
-                const aiBadge = document.createElement('span')
-                aiBadge.className = 'ai-badge'
-                aiBadge.innerHTML = '🤖'
-                aiBadge.title = `AI Generated (${selectedMode})`
-                newNodeEl.appendChild(aiBadge)
-              }
-              
-              suggestionItem.classList.add('added')
-              addBtn.disabled = true
-              addBtn.textContent = '✓'
-            }
-          })
-          
-          suggestionsList.appendChild(suggestionItem)
-        })
+      // Automatically add all children nodes
+      if (result.children && result.children.length > 0) {
+        // Add nodes to the data structure
+        addAINodes(currentNode, result.children)
+        
+        // Refresh the mind map view
+        mind.refresh()
+        
+        // Add visual indicators after refresh
+        setTimeout(() => {
+          if (currentNode) {
+            addVisualIndicators(currentNode)
+          }
+        }, 100)
+        
+        // Show success message
+        suggestionsList.innerHTML = `
+          <div class="ai-success">
+            ✅ ${result.children.length} ${selectedMode === 'question' ? 'perguntas com respostas foram' : 'nós foram'} adicionados com sucesso!
+          </div>
+        `
+        
+        // Clear custom prompt after successful generation
+        if (selectedMode === 'custom') {
+          customPromptTextarea.value = ''
+        }
       } else {
         suggestionsList.innerHTML = '<div class="ai-no-suggestions">Nenhuma sugestão gerada</div>'
       }
@@ -244,9 +298,9 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
           aiPanel.style.display = 'block'
           // Use the current selected node
           const selectedNode = mind.currentNode
-          if (selectedNode) {
-            currentNode = selectedNode
-            nodeTopic.textContent = selectedNode.topic
+          if (selectedNode && selectedNode.nodeObj) {
+            currentNode = selectedNode.nodeObj
+            nodeTopic.textContent = selectedNode.nodeObj.topic
             generateBtn.disabled = false
             
             if (autoSuggest) {
@@ -270,6 +324,19 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     }
   })
 
+  // Also listen for selectNodes event (when clicking on existing nodes)
+  mind.bus.addListener('selectNodes', (nodes: NodeObj[]) => {
+    if (nodes.length > 0) {
+      currentNode = nodes[nodes.length - 1] // Get the last selected node
+      nodeTopic.textContent = currentNode.topic
+      generateBtn.disabled = false
+      
+      if (aiPanel.style.display !== 'none' && autoSuggest) {
+        generateSuggestions()
+      }
+    }
+  })
+
   // Set default mode
   modeBtns[0].classList.add('active')
 
@@ -278,9 +345,9 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     aiPanel.style.display = 'block'
     // Always use the current selected node from mind-elixir
     const selectedNode = mind.currentNode
-    if (selectedNode) {
-      currentNode = selectedNode
-      nodeTopic.textContent = selectedNode.topic
+    if (selectedNode && selectedNode.nodeObj) {
+      currentNode = selectedNode.nodeObj
+      nodeTopic.textContent = selectedNode.nodeObj.topic
       generateBtn.disabled = false
     } else {
       // If no node is selected, use the root node
