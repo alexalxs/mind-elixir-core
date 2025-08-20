@@ -92,8 +92,48 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
       
       if (!file) return
       
-      // File handling will be implemented in Phase 2
-      console.log('File selected:', file.name)
+      // Validate file type
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        alert('Please select a JSON file')
+        return
+      }
+      
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        alert('File size must be less than 10MB')
+        return
+      }
+      
+      // Read file content
+      const reader = new FileReader()
+      
+      reader.onload = (e) => {
+        const content = e.target?.result as string
+        
+        try {
+          const data = JSON.parse(content)
+          
+          // Basic validation - check if it has nodeData
+          if (!data.nodeData) {
+            alert('Invalid mind map structure: missing nodeData')
+            return
+          }
+          
+          // For now, just log the data (Phase 4 will integrate with refresh)
+          console.log('Valid mind map data loaded:', data)
+          alert('File loaded successfully! (Integration pending)')
+          
+        } catch (error) {
+          alert('Invalid JSON format: ' + (error as Error).message)
+        }
+      }
+      
+      reader.onerror = () => {
+        alert('Error reading file')
+      }
+      
+      reader.readAsText(file, 'UTF-8')
     }
     
     document.body.appendChild(fileInput)
