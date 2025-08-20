@@ -19,22 +19,27 @@
       border-color: #e5e7eb;
     }
 
-    #map,
-    #map2 {
-      margin-top: 50px;
-      height: 500px;
-      width: 800px;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
   <div id="map"></div>
-  <!-- test transform compatibility -->
-  <div style="transform: translateX(30px) translateY(20px);">
-    <div id="map2"></div>
-  </div>
-  <div id="ssr"></div>
   <script type="module" src="/src/dev.ts"></script>
 </body>
 

@@ -79,17 +79,7 @@ const options: Options = {
 
 let mind = new MindElixir(options)
 
-const data = MindElixir.new('new topic')
 mind.init(example)
-
-const m2 = new MindElixir({
-  el: '#map2',
-  selectionContainer: 'body', // use body to make selection usable when transform is not 0
-  direction: MindElixir.RIGHT,
-  theme: MindElixir.DARK_THEME,
-  // alignment: 'nodes',
-})
-m2.init(data)
 
 function sleep() {
   return new Promise<void>(res => {
@@ -161,4 +151,5 @@ window.destroy = () => {
   window.m = null
 }
 
-document.querySelector('#ssr')!.innerHTML = renderSSRHTML(layoutSSR(window.m.nodeData))
+// SSR example commented out as #ssr element was removed
+// document.querySelector('#ssr')!.innerHTML = renderSSRHTML(layoutSSR(window.m.nodeData))
