@@ -59,5 +59,10 @@ Consultando o Código criei na pasta de documentações o diagarma de sequencia 
 - Quando for necessário ou solicitado a iniciar um servidor:
 . Sempre verifique primeiro se o processo desejado já esta em execução na porta especificada no projeto e se isso ocorre use esse processo evitando criar um novo processo ou mudar de porta;
 
+- Para testes observe:
+. Não crie arquivos de teste na raiz do projeto e sim dentro da pasta tests
 
-- Quando for iniciar o supabase não use docker pois sempre vamos usar o supabase no site supabase. Use apenas o supabase cli.
+- Ao usar o supabase observe:
+. Quando for iniciar o supabase ative o docker para usar o supabase cli mas não use o supabase local pois sempre vamos usar o supabase no site supabase.
+. Não use RLS nas tabelas e faça a gestão de segurança no código;
+. Use o MCP do Supabase para verificar logs no servidor do supabase ou analisar estrutura de tabelas mas não para fazer migrations. para isso use supabse cli;
