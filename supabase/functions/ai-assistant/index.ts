@@ -178,15 +178,15 @@ serve(async req => {
           {
             role: 'system',
             content:
-              'Você é um assistente especializado em criar mapas mentais. Você recebe o contexto completo do mapa mental e deve gerar conteúdo relevante que agregue valor ao conhecimento existente.',
+              'Você é um assistente especializado em criar mapas mentais. Você recebe o contexto completo do mapa mental e deve gerar conteúdo relevante que agregue valor ao conhecimento existente. SEMPRE retorne suas respostas em formato JSON válido, nunca em texto simples.',
           },
           {
             role: 'user',
             content: prompt,
           },
         ],
-        temperature: 0.7,
-        max_tokens: 300,
+        temperature: 0.3,
+        max_tokens: 500,
       }),
     })
 
