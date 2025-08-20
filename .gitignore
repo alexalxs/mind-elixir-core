@@ -31,3 +31,7 @@ yarn-error.log*
 
 /md
 .env
+.claude/settings.local.json
+supabase/.temp/cli-latest
+supabase/.temp/cli-latest
+.claude/settings.local.json

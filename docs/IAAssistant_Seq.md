@@ -23,7 +23,7 @@ sequenceDiagram
     Note over OAI: IA analisa contexto completo<br/>e sugere apenas tópicos novos
     
     EF-->>ME: {<br/>  children: [<br/>    {topic: "SEO", aiGenerated: true},<br/>    {topic: "Redes Sociais", aiGenerated: true}<br/>  ]<br/>}
-    Note over ME: Resposta já contém estrutura<br/>de nós pronta para adicionar
+    Note over ME: Resposta contém conteúdo gerado<br/>Cliente formata e adiciona ao mapa
     
     ME->>ME: addAINodes(currentNode, children)
     loop Para cada nó filho
@@ -211,20 +211,13 @@ sequenceDiagram
     
     Note over API: Gera perguntas e respostas<br/>sobre o tópico selecionado
     
-    API-->>IAM: Response {<br/>  questionsWithAnswers: [<br/>    {<br/>      question: "O que é Marketing Digital?",<br/>      answer: "É o conjunto de estratégias...",<br/>    },<br/>    {<br/>      question: "Quais são os principais canais?",<br/>      answer: "Os principais canais incluem...",<br/>    },<br/>    {<br/>      question: "Como medir o ROI?",<br/>      answer: "O ROI pode ser medido através...",<br/>    }<br/>  ]<br/>}
+    API-->>IAM: Response {<br/>  children: [<br/>    {<br/>      topic: "O que é Marketing Digital?",<br/>      aiGenerated: true,<br/>      children: [{<br/>        topic: "É o conjunto de estratégias...",<br/>        aiGenerated: true<br/>      }]<br/>    },<br/>    {<br/>      topic: "Como medir o ROI?",<br/>      aiGenerated: true,<br/>      children: [{<br/>        topic: "O ROI pode ser medido através...",<br/>        aiGenerated: true<br/>      }]<br/>    }<br/>  ]<br/>}
     
-    IAM->>IAP: displayQuestionsWithAnswers(questionsWithAnswers)
-    User->>IAP: selectQuestions([0, 2])
-    
-    IAP->>IAM: applyQuestionsWithAnswers(selected)
+    IAM->>ME: Adiciona estrutura Q&A ao mapa
     
     loop Para cada pergunta selecionada
-        Note over IAM: Cria estrutura pai-filho
-        IAM->>ME: addChild(parentId, {<br/>  topic: question,<br/>  aiGenerated: true<br/>})
-        ME-->>IAM: questionNode
-        
-        IAM->>ME: addChild(questionNode.id, {<br/>  topic: answer,<br/>  aiGenerated: true<br/>})
-        
+        Note over IAM: Adiciona pergunta como nó pai
+        Note over IAM: Adiciona resposta como nó filho
         ME->>DOM: linkDiv.refresh()
     end
     

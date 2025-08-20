@@ -12,6 +12,9 @@
 
 ### Documentação da Edge Function `/ai-assistant`
 
+#### Objetivo
+Fornecer à IA o contexto completo do mapa mental para gerar conteúdo útil e relevante baseado em toda a estrutura de conhecimento existente, não apenas no nó selecionado.
+
 #### Endpoint
 ```
 POST https://{project-ref}.supabase.co/functions/v1/ai-assistant
@@ -30,11 +33,11 @@ POST https://{project-ref}.supabase.co/functions/v1/ai-assistant
 ```typescript
 interface RequestPayload {
   mindMap: {
-    nodeData: MindMapNode  // JSON completo do mapa mental
+    nodeData: MindMapNode  // JSON completo do mapa mental com toda estrutura hierárquica
   }
-  selectedNodeId: string   // ID do nó selecionado
+  selectedNodeId: string   // ID do nó selecionado (ponto focal para geração)
   mode: 'expand' | 'question' | 'custom'
-  depth?: number          // Número de sugestões (padrão: 5)
+  depth?: number          // Número de itens a gerar (padrão: 5)
   customPrompt?: string   // Prompt customizado (apenas para mode='custom')
 }
 ```
@@ -51,18 +54,18 @@ interface MindMapNode {
 
 #### Resposta da API
 
-A API retorna uma estrutura de nós já formatada para ser adicionada diretamente ao mapa mental:
+A API retorna conteúdo gerado pela IA que será processado e formatado pelo cliente:
 
 **Para modo expand e custom:**
 ```json
 {
   "children": [
     {
-      "topic": "Subtópico 1",
+      "topic": "Conteúdo gerado pela IA",
       "aiGenerated": true
     },
     {
-      "topic": "Subtópico 2",
+      "topic": "Outro conteúdo relevante",
       "aiGenerated": true
     }
   ],
@@ -76,62 +79,50 @@ A API retorna uma estrutura de nós já formatada para ser adicionada diretament
 {
   "children": [
     {
-      "topic": "Pergunta 1?",
+      "topic": "Pergunta gerada pela IA?",
       "aiGenerated": true,
       "children": [
         {
-          "topic": "Resposta detalhada para a pergunta 1",
-          "aiGenerated": true
-        }
-      ]
-    },
-    {
-      "topic": "Pergunta 2?",
-      "aiGenerated": true,
-      "children": [
-        {
-          "topic": "Resposta detalhada para a pergunta 2",
+          "topic": "Resposta detalhada baseada no contexto do mapa",
           "aiGenerated": true
         }
       ]
     }
   ],
   "mode": "question",
-  "selectedNodeTopic": "Tópico do nó selecionado"
+  "selectedNodeTopic": "Tópico selecionado"
 }
 ```
 
-**Importante**: A resposta já contém a estrutura completa dos nós que serão adicionados automaticamente ao mapa mental. O plugin frontend adiciona:
-- ID único gerado automaticamente para cada nó
-- Propriedades de estilo herdadas do nó pai
-- Timestamp (aiGeneratedAt) indicando quando foi gerado
-- Badge visual 🤖
+**Importante**: A API retorna apenas o conteúdo gerado pela IA. O cliente (plugin frontend) é responsável por:
+- Gerar IDs únicos para cada nó
+- Aplicar formatação e estilos herdados
+- Adicionar metadados (aiGeneratedAt)
+- Criar estrutura hierárquica no mapa mental
+- Adicionar indicadores visuais 🤖
 
 #### Prompts Utilizados pela Edge Function
 
-A função constrói prompts contextualizados baseados no modo selecionado:
+A função envia o mapa mental completo como contexto para a IA, permitindo que ela compreenda toda a estrutura e relações do conhecimento. O mapa completo é enviado no payload junto com o ID do nó selecionado.
 
 **1. Modo Expand (Expandir)**
 ```
-Contexto do mapa mental:
-- Nó selecionado: "{topic}"
-- Tópicos já existentes no mapa: {lista de todos os tópicos}
+Você tem acesso ao mapa mental completo em formato JSON.
+Nó selecionado: "{topic}"
 
-IMPORTANTE: Não sugira tópicos que já existem no mapa mental.
-
-Expanda o tópico "{topic}" em {depth} subtópicos relevantes e únicos. 
+Com base no contexto completo do mapa mental e no tópico selecionado, 
+expanda "{topic}" em {depth} subtópicos relevantes que agreguem valor ao conhecimento existente.
 Responda apenas com a lista numerada, um item por linha.
 ```
 
 **2. Modo Question (Perguntas com Respostas)**
 ```
-Contexto do mapa mental:
-- Nó selecionado: "{topic}"
-- Tópicos já existentes no mapa: {lista de todos os tópicos}
+Você tem acesso ao mapa mental completo em formato JSON.
+Nó selecionado: "{topic}"
 
-IMPORTANTE: Não sugira tópicos que já existem no mapa mental.
+Com base no contexto completo do mapa mental, gere {depth} perguntas exploratórias 
+sobre "{topic}" que aprofundem o conhecimento, junto com suas respectivas respostas.
 
-Gere {depth} perguntas exploratórias sobre "{topic}" com suas respectivas respostas.
 Para cada pergunta, formate a resposta como:
 Q: [pergunta]
 A: [resposta concisa]
@@ -141,11 +132,8 @@ Separe cada par pergunta-resposta com uma linha em branco.
 
 **3. Modo Custom (Personalizado)**
 ```
-Contexto do mapa mental:
-- Nó selecionado: "{topic}"
-- Tópicos já existentes no mapa: {lista de todos os tópicos}
-
-IMPORTANTE: Não sugira tópicos que já existem no mapa mental.
+Você tem acesso ao mapa mental completo em formato JSON.
+Nó selecionado: "{topic}"
 
 {customPrompt fornecido pelo usuário}
 ```
@@ -154,7 +142,7 @@ IMPORTANTE: Não sugira tópicos que já existem no mapa mental.
 - **Modelo**: gpt-3.5-turbo
 - **Temperature**: 0.7
 - **Max Tokens**: 300
-- **System Message**: "Você é um assistente especializado em criar mapas mentais. Suas respostas devem ser concisas, relevantes e evitar duplicação de conteúdo já existente."
+- **System Message**: "Você é um assistente especializado em criar mapas mentais. Você recebe o contexto completo do mapa mental e deve gerar conteúdo relevante que agregue valor ao conhecimento existente."
 
 #### Tratamento de Erros
 - Limite de payload: 1MB
