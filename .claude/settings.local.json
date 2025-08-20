@@ -8,8 +8,24 @@
       "Bash(grep:*)",
       "Bash(rm:*)",
       "Bash(env)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(supabase:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cp:*)",
+      "mcp__supabase-mindmap__list_edge_functions",
+      "mcp__supabase-mindmap__get_project_url",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "mcp__supabase-mindmap__get_logs",
+      "mcp__supabase-mindmap__get_anon_key",
+      "Bash(git add:*)"
     ],
     "deny": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "playwright",
+    "supabase-mindmap",
+    "browsermcp"
+  ]
 }

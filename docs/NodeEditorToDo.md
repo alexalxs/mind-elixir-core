@@ -9,6 +9,8 @@
 [ ] Botões para peso da fonte (normal/bold)
 [ ] Preview em tempo real das mudanças
 [ ] Integração com reshapeNode() para aplicar mudanças
+[Fix] Implemente o layout da caixa de formação acima do nó selecionado e que esta presente docs/images/1.png 
+[Fix] A caixa de formatação será ligada ao nó selecionado mesmo quando esse nó selecionado é alternado
 
 ## Fase 2 - Editor de Formatação Rica:
 [ ] Toolbar WYSIWYG com botões de formatação (B, I, U, etc)

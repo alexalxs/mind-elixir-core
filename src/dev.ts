@@ -9,6 +9,7 @@ import style from '../index.css?raw'
 import katex from '../katex.css?raw'
 import { layoutSSR, renderSSRHTML } from './utils/layout-ssr'
 import { snapdom } from '@zumer/snapdom'
+import styleEditor from './plugin/styleEditor'
 
 interface Window {
   m?: MindElixirInstance
@@ -80,6 +81,9 @@ const options: Options = {
 let mind = new MindElixir(options)
 
 mind.init(example)
+
+// Initialize style editor
+styleEditor(mind)
 
 function sleep() {
   return new Promise<void>(res => {

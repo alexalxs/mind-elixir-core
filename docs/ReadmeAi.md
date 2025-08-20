@@ -37,7 +37,7 @@ Não adicione blocos de código.
 . Use os recursos nativos da solução e não faça solução de contorno;
 . Suas criações ou alteraçõe não devem afetar outros elementos ou funções do sistema; 
 . Sempre refatore arquivos que passarem de 500 linhas;
-. Ao final execute npm run build e itere até corrigir qualquer erro e se não houver mais erros faça o commit;
+. Ao final execute npm run build e itere até corrigir qualquer erro;
 
 - Quando solicitado a criar ou modificar um diagrama de sequencia: Crie dentro da pasta /Docs um arquivo .md com o prefixo do tema em estudo como por exemplo AuthContext_Seq.md. 
 Se o arquivo já estiver presente, analise se já há um arquivo .md com diagrama de sequencia mermaid para o referido tema ( não faça fluxos  que tenham mais de um caso de uso).  

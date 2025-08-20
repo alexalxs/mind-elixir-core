@@ -168,6 +168,7 @@ export interface NodeObj {
     color: string
     background: string
     fontWeight: string
+    fontStyle?: string
     width: string
     border: string
     textDecoration: string

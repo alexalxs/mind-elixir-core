@@ -1,0 +1,40 @@
+{
+  "mindMap": {
+    "nodeData": {
+      "topic": "Mind Elixir",
+      "id": "root",
+      "children": [
+        {
+          "topic": "Marketing Digital",
+          "id": "n123",
+          "children": [
+            {
+              "topic": "SEO",
+              "id": "n124"
+            },
+            {
+              "topic": "Redes Sociais",
+              "id": "n125"
+            }
+          ]
+        },
+        {
+          "topic": "Desenvolvimento Web",
+          "id": "n126",
+          "children": [
+            {
+              "topic": "Frontend",
+              "id": "n127"
+            },
+            {
+              "topic": "Backend",
+              "id": "n128"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "selectedNodeId": "n123",
+  "mode": "expand"
+}
