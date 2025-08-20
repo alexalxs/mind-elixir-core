@@ -41,13 +41,55 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     editor.innerHTML = `
       <div class="style-editor-header">
         <div class="style-editor-tabs">
-          <button class="tab-btn active" data-tab="text">Texto</button>
-          <button class="tab-btn" data-tab="content">Conteúdo</button>
+          <button class="tab-btn active" data-tab="node">Nó</button>
+          <button class="tab-btn" data-tab="text">Texto</button>
         </div>
         <button class="close-btn">&times;</button>
       </div>
       <div class="style-editor-content">
-        <div class="tab-content active" data-content="text">
+        <div class="tab-content active" data-content="node">
+          <div class="color-section">
+            <div class="color-label">Cor de Fundo</div>
+            <div class="color-palette">
+              ${colors
+                .map(
+                  color =>
+                    `<button class="color-btn bg-color" data-color="${color}" data-type="background" style="background-color: ${color}"></button>`
+                )
+                .join('')}
+            </div>
+          </div>
+          <div class="additional-styles">
+            <div class="style-group">
+              <label>Borda</label>
+              <select class="style-select" data-property="border">
+                <option value="">Nenhuma</option>
+                <option value="1px solid">Sólida fina</option>
+                <option value="2px solid">Sólida média</option>
+                <option value="3px solid">Sólida grossa</option>
+                <option value="1px dashed">Tracejada fina</option>
+                <option value="2px dashed">Tracejada média</option>
+                <option value="1px dotted">Pontilhada fina</option>
+                <option value="2px dotted">Pontilhada média</option>
+                <option value="double">Dupla</option>
+              </select>
+            </div>
+            <div class="style-group">
+              <label>Largura</label>
+              <select class="style-select" data-property="width">
+                <option value="">Automática</option>
+                <option value="100px">100px</option>
+                <option value="150px">150px</option>
+                <option value="200px">200px</option>
+                <option value="250px">250px</option>
+                <option value="300px">300px</option>
+                <option value="400px">400px</option>
+                <option value="500px">500px</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="tab-content" data-content="text">
           <div class="font-family-row">
             ${fontFamilies
               .map(
@@ -65,6 +107,17 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
             <button class="style-btn size-btn" data-action="size-down">A</button>
             <button class="style-btn size-btn size-up" data-action="size-up">A</button>
           </div>
+          <div class="additional-styles">
+            <div class="style-group">
+              <label>Decoração do Texto</label>
+              <select class="style-select" data-property="textDecoration">
+                <option value="none">Nenhuma</option>
+                <option value="underline">Sublinhado</option>
+                <option value="overline">Linha acima</option>
+                <option value="line-through">Riscado</option>
+              </select>
+            </div>
+          </div>
           <div class="color-section">
             <div class="color-label">Cor do Texto</div>
             <div class="color-palette">
@@ -76,61 +129,6 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
                 .join('')}
             </div>
           </div>
-          <div class="color-section">
-            <div class="color-label">Cor de Fundo</div>
-            <div class="color-palette">
-              ${colors
-                .map(
-                  color =>
-                    `<button class="color-btn bg-color" data-color="${color}" data-type="background" style="background-color: ${color}"></button>`
-                )
-                .join('')}
-            </div>
-          </div>
-          <div class="additional-styles">
-            <div class="style-group">
-              <label>Tamanho da Fonte</label>
-              <input type="text" class="style-input" data-property="fontSize" placeholder="e.g., 16px">
-            </div>
-            <div class="style-group">
-              <label>Borda</label>
-              <select class="style-select" data-property="border">
-                <option value="">Nenhuma</option>
-                <option value="1px solid #ccc">Fina cinza</option>
-                <option value="2px solid #666">Média cinza</option>
-                <option value="3px solid #333">Grossa cinza</option>
-                <option value="1px solid #0066ff">Fina azul</option>
-                <option value="2px solid #0066ff">Média azul</option>
-                <option value="1px dashed #666">Tracejada</option>
-                <option value="1px dotted #666">Pontilhada</option>
-              </select>
-            </div>
-            <div class="style-group">
-              <label>Largura</label>
-              <select class="style-select" data-property="width">
-                <option value="">Automática</option>
-                <option value="100px">100px</option>
-                <option value="150px">150px</option>
-                <option value="200px">200px</option>
-                <option value="250px">250px</option>
-                <option value="300px">300px</option>
-                <option value="400px">400px</option>
-                <option value="500px">500px</option>
-              </select>
-            </div>
-            <div class="style-group">
-              <label>Decoração do Texto</label>
-              <select class="style-select" data-property="textDecoration">
-                <option value="none">Nenhuma</option>
-                <option value="underline">Sublinhado</option>
-                <option value="overline">Linha acima</option>
-                <option value="line-through">Riscado</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="tab-content" data-content="content">
-          <div class="content-placeholder">Editor de conteúdo HTML (em breve)...</div>
         </div>
       </div>
     `
@@ -310,9 +308,6 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     }
     
     // Update input fields
-    const fontSizeInput = editorEl.querySelector('[data-property="fontSize"]') as HTMLInputElement
-    if (fontSizeInput) fontSizeInput.value = nodeObj.style?.fontSize || ''
-    
     const borderSelect = editorEl.querySelector('[data-property="border"]') as HTMLSelectElement
     if (borderSelect) borderSelect.value = nodeObj.style?.border || ''
     
