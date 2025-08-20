@@ -39,34 +39,76 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     const editor = document.createElement('div')
     editor.className = 'style-editor'
     editor.innerHTML = `
+      <div class="style-editor-header">
+        <div class="style-editor-tabs">
+          <button class="tab-btn active" data-tab="format">Format</button>
+          <button class="tab-btn" data-tab="content">Content</button>
+        </div>
+        <button class="close-btn">&times;</button>
+      </div>
       <div class="style-editor-content">
-        <div class="font-family-row">
-          ${fontFamilies
-            .map(
-              (font, i) =>
-                `<button class="font-btn" data-font="${i}" style="font-family: ${font.value}; ${
-                  font.style ? `font-style: ${font.style}` : ''
-                }">${font.preview}</button>`
-            )
-            .join('')}
-        </div>
-        <div class="style-controls">
-          <button class="style-btn bold-btn" data-action="bold"><strong>B</strong></button>
-          <button class="style-btn italic-btn" data-action="italic"><em>i</em></button>
-          <div class="separator"></div>
-          <button class="style-btn size-btn" data-action="size-down">A</button>
-          <button class="style-btn size-btn size-up" data-action="size-up">A</button>
-        </div>
-        <div class="color-section">
-          <div class="color-label">Theme Colors</div>
-          <div class="color-palette">
-            ${colors
+        <div class="tab-content active" data-content="format">
+          <div class="font-family-row">
+            ${fontFamilies
               .map(
-                color =>
-                  `<button class="color-btn" data-color="${color}" style="background-color: ${color}"></button>`
+                (font, i) =>
+                  `<button class="font-btn" data-font="${i}" style="font-family: ${font.value}; ${
+                    font.style ? `font-style: ${font.style}` : ''
+                  }">${font.preview}</button>`
               )
               .join('')}
           </div>
+          <div class="style-controls">
+            <button class="style-btn bold-btn" data-action="bold"><strong>B</strong></button>
+            <button class="style-btn italic-btn" data-action="italic"><em>i</em></button>
+            <div class="separator"></div>
+            <button class="style-btn size-btn" data-action="size-down">A</button>
+            <button class="style-btn size-btn size-up" data-action="size-up">A</button>
+          </div>
+          <div class="color-section">
+            <div class="color-label">Text Color</div>
+            <div class="color-palette">
+              ${colors
+                .map(
+                  color =>
+                    `<button class="color-btn text-color" data-color="${color}" data-type="text" style="background-color: ${color}"></button>`
+                )
+                .join('')}
+            </div>
+          </div>
+          <div class="color-section">
+            <div class="color-label">Background Color</div>
+            <div class="color-palette">
+              ${colors
+                .map(
+                  color =>
+                    `<button class="color-btn bg-color" data-color="${color}" data-type="background" style="background-color: ${color}"></button>`
+                )
+                .join('')}
+            </div>
+          </div>
+          <div class="additional-styles">
+            <div class="style-group">
+              <label>Border</label>
+              <input type="text" class="style-input" data-property="border" placeholder="e.g., 2px solid red">
+            </div>
+            <div class="style-group">
+              <label>Width</label>
+              <input type="text" class="style-input" data-property="width" placeholder="e.g., 200px">
+            </div>
+            <div class="style-group">
+              <label>Text Decoration</label>
+              <select class="style-select" data-property="textDecoration">
+                <option value="none">None</option>
+                <option value="underline">Underline</option>
+                <option value="overline">Overline</option>
+                <option value="line-through">Line Through</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="tab-content" data-content="content">
+          <div class="content-placeholder">Content editing coming soon...</div>
         </div>
       </div>
     `
@@ -78,21 +120,14 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
   editorEl = createEditor()
   mind.container.appendChild(editorEl)
 
-  // Position editor above node
-  const positionEditor = (node: Topic) => {
+  // Position editor in top right corner
+  const positionEditor = () => {
     if (!editorEl) return
-
-    const nodeRect = node.getBoundingClientRect()
-    const containerRect = mind.container.getBoundingClientRect()
-    const editorHeight = 200 // approximate height
-
-    // Calculate position relative to container
-    const left = nodeRect.left - containerRect.left + nodeRect.width / 2
-    const top = nodeRect.top - containerRect.top - editorHeight - 10
-
-    editorEl.style.left = `${left}px`
-    editorEl.style.top = `${top}px`
-    editorEl.style.transform = 'translateX(-50%)'
+    // Fixed position in top right corner
+    editorEl.style.position = 'fixed'
+    editorEl.style.top = '20px'
+    editorEl.style.right = '20px'
+    editorEl.style.transform = 'none'
   }
 
   // Show editor for node
@@ -100,7 +135,8 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     if (!editorEl) return
     currentNode = node
     editorEl.style.display = 'block'
-    positionEditor(node)
+    positionEditor()
+    updateActiveStates()
   }
 
   // Hide editor
@@ -155,9 +191,25 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
   }
 
   // Handle color change
-  const handleColorChange = (color: string) => {
-    applyStyle('color', color)
+  const handleColorChange = (color: string, type: string) => {
+    if (type === 'background') {
+      applyStyle('background', color)
+    } else {
+      applyStyle('color', color)
+    }
   }
+
+  // Handle input/select changes
+  editorEl.addEventListener('change', (e) => {
+    const target = e.target as HTMLElement
+    if (target.classList.contains('style-input') || target.classList.contains('style-select')) {
+      const property = target.dataset.property as keyof NonNullable<NodeObj['style']>
+      const value = (target as HTMLInputElement | HTMLSelectElement).value
+      if (property) {
+        applyStyle(property, value || '')
+      }
+    }
+  })
 
   // Event listeners
   editorEl.addEventListener('click', (e) => {
@@ -169,10 +221,25 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
       handleFontFamily(index)
     } else if (target.classList.contains('style-btn')) {
       const action = target.dataset.action
-      if (action) handleStyleAction(action)
+      if (action) {
+        handleStyleAction(action)
+        updateActiveStates()
+      }
     } else if (target.classList.contains('color-btn')) {
       const color = target.dataset.color
-      if (color) handleColorChange(color)
+      const type = target.dataset.type || 'text'
+      if (color) handleColorChange(color, type)
+    } else if (target.classList.contains('style-input')) {
+      const property = target.dataset.property as keyof NonNullable<NodeObj['style']>
+      const value = (target as HTMLInputElement).value
+      if (property) {
+        applyStyle(property, value || '')
+      }
+    } else if (target.classList.contains('tab-btn')) {
+      const tab = target.dataset.tab
+      if (tab) handleTabSwitch(tab)
+    } else if (target.classList.contains('close-btn')) {
+      hideEditor()
     }
   })
 
@@ -203,21 +270,51 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     }
   })
 
-  // Update position when container scrolls or resizes
-  const updatePosition = () => {
-    if (currentNode && editorEl?.style.display !== 'none') {
-      positionEditor(currentNode)
+  // Update active states based on current node
+  const updateActiveStates = () => {
+    if (!currentNode || !editorEl) return
+    const nodeObj = currentNode.nodeObj
+    
+    // Update bold button
+    const boldBtn = editorEl.querySelector('[data-action="bold"]')
+    if (boldBtn) {
+      boldBtn.classList.toggle('active', nodeObj.style?.fontWeight === 'bold')
     }
+    
+    // Update italic button
+    const italicBtn = editorEl.querySelector('[data-action="italic"]')
+    if (italicBtn) {
+      italicBtn.classList.toggle('active', nodeObj.style?.fontStyle === 'italic')
+    }
+    
+    // Update input fields
+    const borderInput = editorEl.querySelector('[data-property="border"]') as HTMLInputElement
+    if (borderInput) borderInput.value = nodeObj.style?.border || ''
+    
+    const widthInput = editorEl.querySelector('[data-property="width"]') as HTMLInputElement
+    if (widthInput) widthInput.value = nodeObj.style?.width || ''
+    
+    const textDecorationSelect = editorEl.querySelector('[data-property="textDecoration"]') as HTMLSelectElement
+    if (textDecorationSelect) textDecorationSelect.value = nodeObj.style?.textDecoration || 'none'
   }
 
-  mind.container.addEventListener('scroll', updatePosition)
-  window.addEventListener('resize', updatePosition)
+  // Handle tab switching
+  const handleTabSwitch = (tabName: string) => {
+    const tabs = editorEl?.querySelectorAll('.tab-btn')
+    const contents = editorEl?.querySelectorAll('.tab-content')
+    
+    tabs?.forEach(tab => {
+      tab.classList.toggle('active', tab.getAttribute('data-tab') === tabName)
+    })
+    
+    contents?.forEach(content => {
+      content.classList.toggle('active', content.getAttribute('data-content') === tabName)
+    })
+  }
 
   // Cleanup
   const destroy = () => {
     editorEl?.remove()
-    mind.container.removeEventListener('scroll', updatePosition)
-    window.removeEventListener('resize', updatePosition)
   }
 
   return { destroy }

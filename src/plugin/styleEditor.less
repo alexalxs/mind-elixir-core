@@ -1,16 +1,88 @@
 .style-editor {
-  position: absolute;
+  position: fixed;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  padding: 12px;
   z-index: 1000;
-  min-width: 280px;
+  width: 320px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .style-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+
+    .style-editor-tabs {
+      display: flex;
+      gap: 8px;
+
+      .tab-btn {
+        padding: 6px 16px;
+        border: none;
+        background: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #f5f5f5;
+        }
+
+        &.active {
+          background: #e8f0fe;
+          color: #0066ff;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .close-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 20px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #f5f5f5;
+        color: #333;
+      }
+    }
+  }
 
   .style-editor-content {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    padding: 12px;
+    overflow-y: auto;
+    flex: 1;
+
+    .tab-content {
+      display: none;
+
+      &.active {
+        display: block;
+      }
+
+      .content-placeholder {
+        padding: 40px;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+      }
+    }
   }
 
   .font-family-row {
@@ -126,6 +198,44 @@
             border-radius: 50%;
           }
         }
+      }
+    }
+  }
+
+  .additional-styles {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .style-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 12px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .style-input, .style-select {
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: #0066ff;
+          box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
+        }
+      }
+
+      .style-select {
+        cursor: pointer;
+        background: white;
       }
     }
   }
