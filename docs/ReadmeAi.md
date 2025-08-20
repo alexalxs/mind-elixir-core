@@ -9,7 +9,7 @@
 . Revise de forma crítica o código ou planejamento procurando pontos de melhorias como reaproveitamento de código;
 . Analise de forma independente e do zero o código do projeto;
 
-- Quando solicitado a fazer um ToDo: Crie dentro da pasta /Docs um arquivo md com o prefixo do componente como por exemplo AuthContextToDo.md. 
+- Quando solicitado a fazer um ToDo por grupo de recurso: Crie dentro da pasta /Docs um arquivo md com o prefixo do componente como por exemplo AuthContextToDo.md. 
 . Nele deve ter, de forma muito resumida e em tópicos o que o componente ou função faz da seguinte forma se for pedido por grupo de recursos:
 - Grupo de recurso:
 [ ] recurso;
@@ -18,7 +18,9 @@
 [ ] recurso;
 [ ] recurso;
 O Grupo de recursos são baseados em critérios como design, funcionalidade, integrações e etc. 
+Não adicione blocos de código.
 
+- Quando solicitado a fazer um ToDo por fases: Crie dentro da pasta /Docs um arquivo md com o prefixo do componente como por exemplo AuthContextToDo.md. 
 . Nele deve ter, de forma muito resumida e em tópicos o que o componente ou função faz da seguinte forma se for pedido por fases:
 - fase 1:
 [ ] recurso;
@@ -27,7 +29,7 @@ O Grupo de recursos são baseados em critérios como design, funcionalidade, int
 [ ] recurso;
 [ ] recurso;
 As fases se organizam de forma lógica para implementar uma funcionalidade maior.
-
+Não adicione blocos de código.
 
 
 - Quando solicitado a criar ou modificar o código:
@@ -35,7 +37,7 @@ As fases se organizam de forma lógica para implementar uma funcionalidade maior
 . Use os recursos nativos da solução e não faça solução de contorno;
 . Suas criações ou alteraçõe não devem afetar outros elementos ou funções do sistema; 
 . Sempre refatore arquivos que passarem de 500 linhas;
-. Ao final execute npm run build e itere até corrigir qualquer erro;
+. Ao final execute npm run build e itere até corrigir qualquer erro e se não houver mais erros faça o commit;
 
 - Quando solicitado a criar ou modificar um diagrama de sequencia: Crie dentro da pasta /Docs um arquivo .md com o prefixo do tema em estudo como por exemplo AuthContext_Seq.md. 
 Se o arquivo já estiver presente, analise se já há um arquivo .md com diagrama de sequencia mermaid para o referido tema ( não faça fluxos  que tenham mais de um caso de uso).  
@@ -56,48 +58,3 @@ Consultando o Código criei na pasta de documentações o diagarma de sequencia 
 
 - Quando for necessário ou solicitado a iniciar um servidor:
 . Sempre verifique primeiro se o processo desejado já esta em execução na porta especificada no projeto e se isso ocorre use esse processo evitando criar um novo processo ou mudar de porta;
-
-## Funcionalidades Necessárias
-
-
-### Sistema de Notas Expandidas para Nós
-**Necessidade:** Implementar um sistema que permita adicionar anotações detalhadas aos nós do mapa mental sem poluir a visualização principal.
-
-**Descrição Detalhada:**
-- [ ] Cada nó deve poder ter uma nota associada que contenha texto longo e formatado
-- [ ] As notas devem ser armazenadas de forma vinculada ao nó correspondente
-- [ ] Interface de edição em janela modal ou painel lateral separado
-- [ ] Indicador visual no nó quando houver uma nota anexada (ex: ícone de documento)
-- [ ] Visualização rápida da nota ao passar o mouse sobre o nó (tooltip expandido)
-- [ ] Opção de abrir/fechar a nota completa ao clicar no indicador ou através de atalho de teclado
-- [ ] Suporte para formatação básica do texto (negrito, itálico, listas, links)
-- [ ] Exportação das notas junto com o mapa mental
-- [ ] Busca de conteúdo dentro das notas anexadas
-
-**Exemplo de Uso:**
-- [ ] Um nó "Projeto X" poderia ter uma nota anexada contendo:
-  - Descrição completa do projeto
-  - Lista de requisitos técnicos
-  - Links para documentação externa
-  - Anotações de reuniões
-  - Cronograma detalhado
-- [ ] Ao clicar no ícone de nota do nó, uma janela lateral se abriria mostrando todo esse conteúdo formatado
-- [ ] O usuário poderia editar a nota sem afetar o texto principal do nó no mapa
-
-**Benefícios:**
-- [ ] Permite documentação detalhada sem comprometer a clareza visual do mapa
-- [ ] Facilita o uso do mapa mental como ferramenta de organização de conhecimento
-- [ ] Mantém a interface limpa enquanto permite acesso rápido a informações complementares
-
-### Sistema de Abertura e Importação de Mapas
-**Necessidade:** Implementar funcionalidade para carregar mapas mentais existentes, permitindo reutilização e compartilhamento de conteúdo.
-
-**Descrição Detalhada:**
-- [Fix] Interface **modal** de upload que aceite arquivos de mapas mentais em formatos suportados (JSON, XML, etc.). importar xmind com opção.
-- [ ] Galeria de mapas de exemplo pré-carregados para demonstração e templates
-- [ ] Validação de formato e estrutura do arquivo antes da importação
-- [ ] Tratamento de erros com mensagens claras para arquivos inválidos ou corrompidos
-- [Fix] Após importar deve ser aberto em /index.html permitindo as mesma ações permitidas ao mapa padrão da aplicação como edição;
-
-### Página inicial
-- [fix] em /index.html Abrir como o mapa padrão do mind-elixir-core que por algum motivo foi removido;
