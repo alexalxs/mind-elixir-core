@@ -7,6 +7,7 @@ import living from '../icons/living.svg?raw'
 import zoomin from '../icons/zoomin.svg?raw'
 import zoomout from '../icons/zoomout.svg?raw'
 import folderopen from '../icons/folder-open.svg?raw'
+import ai from '../icons/ai.svg?raw'
 import i18n from '../i18n'
 
 import './toolBar.less'
@@ -20,6 +21,7 @@ const map: Record<string, string> = {
   zoomin,
   zoomout,
   folderopen,
+  ai,
 }
 const createButton = (id: string, name: string) => {
   const button = document.createElement('span')
@@ -120,11 +122,13 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
   const r = createButton('tbltr', 'right')
   const s = createButton('tblts', 'side')
   const openFile = createButton('openfile', 'folderopen')
+  const aiButton = createButton('ai-assistant', 'ai')
 
   toolBarLTContainer.appendChild(l)
   toolBarLTContainer.appendChild(r)
   toolBarLTContainer.appendChild(s)
   toolBarLTContainer.appendChild(openFile)
+  toolBarLTContainer.appendChild(aiButton)
   toolBarLTContainer.className = 'mind-elixir-toolbar lt'
   l.onclick = () => {
     mind.initLeft()
@@ -205,6 +209,11 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
     document.body.appendChild(fileInput)
     fileInput.click()
     document.body.removeChild(fileInput)
+  }
+  aiButton.title = 'AI Assistant'
+  aiButton.onclick = () => {
+    // Emit event to open AI assistant panel
+    mind.bus.fire('openAIAssistant')
   }
   return toolBarLTContainer
 }

@@ -172,6 +172,12 @@ export interface NodeObj {
     width: string
     border: string
     textDecoration: string
+    padding?: string
+    borderRadius?: string
+    opacity?: string
+    lineHeight?: string
+    textAlign?: string
+    boxShadow?: string
   }>
   children?: NodeObj[]
   tags?: string[]

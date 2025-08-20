@@ -87,9 +87,70 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
                 <option value="500px">500px</option>
               </select>
             </div>
+            <div class="style-group">
+              <label>Espaçamento Interno</label>
+              <select class="style-select" data-property="padding">
+                <option value="">Padrão</option>
+                <option value="4px">Pequeno (4px)</option>
+                <option value="8px">Médio (8px)</option>
+                <option value="12px">Grande (12px)</option>
+                <option value="16px">Extra Grande (16px)</option>
+                <option value="4px 8px">Vertical Pequeno</option>
+                <option value="8px 16px">Vertical Médio</option>
+                <option value="12px 24px">Vertical Grande</option>
+              </select>
+            </div>
+            <div class="style-group">
+              <label>Cantos Arredondados</label>
+              <select class="style-select" data-property="borderRadius">
+                <option value="">Padrão</option>
+                <option value="0px">Quadrado</option>
+                <option value="4px">Levemente Arredondado</option>
+                <option value="8px">Arredondado</option>
+                <option value="12px">Muito Arredondado</option>
+                <option value="16px">Super Arredondado</option>
+                <option value="50%">Totalmente Arredondado</option>
+              </select>
+            </div>
+            <div class="style-group">
+              <label>Opacidade</label>
+              <select class="style-select" data-property="opacity">
+                <option value="">100%</option>
+                <option value="0.9">90%</option>
+                <option value="0.8">80%</option>
+                <option value="0.7">70%</option>
+                <option value="0.6">60%</option>
+                <option value="0.5">50%</option>
+                <option value="0.4">40%</option>
+                <option value="0.3">30%</option>
+              </select>
+            </div>
+            <div class="style-group">
+              <label>Sombra</label>
+              <select class="style-select" data-property="boxShadow">
+                <option value="">Nenhuma</option>
+                <option value="0 1px 3px rgba(0,0,0,0.12)">Suave</option>
+                <option value="0 2px 6px rgba(0,0,0,0.16)">Pequena</option>
+                <option value="0 4px 8px rgba(0,0,0,0.2)">Média</option>
+                <option value="0 6px 12px rgba(0,0,0,0.24)">Grande</option>
+                <option value="0 8px 16px rgba(0,0,0,0.3)">Extra Grande</option>
+                <option value="inset 0 2px 4px rgba(0,0,0,0.2)">Interna</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="tab-content" data-content="text">
+          <div class="color-section">
+            <div class="color-label">Cor do Texto</div>
+            <div class="color-palette">
+              ${colors
+                .map(
+                  color =>
+                    `<button class="color-btn text-color" data-color="${color}" data-type="text" style="background-color: ${color}"></button>`
+                )
+                .join('')}
+            </div>
+          </div>
           <div class="font-family-row">
             ${fontFamilies
               .map(
@@ -107,26 +168,36 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
             <button class="style-btn size-btn" data-action="size-down">A</button>
             <button class="style-btn size-btn size-up" data-action="size-up">A</button>
           </div>
-          <div class="additional-styles">
-            <div class="style-group">
-              <label>Decoração do Texto</label>
-              <select class="style-select" data-property="textDecoration">
-                <option value="none">Nenhuma</option>
-                <option value="underline">Sublinhado</option>
-                <option value="overline">Linha acima</option>
-                <option value="line-through">Riscado</option>
-              </select>
+          <div class="text-decoration-controls">
+            <label class="decoration-label">Decoração do Texto</label>
+            <div class="decoration-buttons">
+              <button class="style-btn decoration-btn" data-action="decoration-none" title="Sem decoração">A</button>
+              <button class="style-btn decoration-btn" data-action="decoration-underline" title="Sublinhado"><u>A</u></button>
+              <button class="style-btn decoration-btn" data-action="decoration-overline" title="Linha acima"><span style="text-decoration: overline">A</span></button>
+              <button class="style-btn decoration-btn" data-action="decoration-linethrough" title="Riscado"><s>A</s></button>
             </div>
           </div>
-          <div class="color-section">
-            <div class="color-label">Cor do Texto</div>
-            <div class="color-palette">
-              ${colors
-                .map(
-                  color =>
-                    `<button class="color-btn text-color" data-color="${color}" data-type="text" style="background-color: ${color}"></button>`
-                )
-                .join('')}
+          <div class="additional-styles">
+            <div class="style-group">
+              <label>Altura da Linha</label>
+              <select class="style-select" data-property="lineHeight">
+                <option value="">Normal</option>
+                <option value="1">Compacto (1)</option>
+                <option value="1.2">Apertado (1.2)</option>
+                <option value="1.5">Padrão (1.5)</option>
+                <option value="1.8">Confortável (1.8)</option>
+                <option value="2">Espaçoso (2)</option>
+                <option value="2.5">Extra Espaçoso (2.5)</option>
+              </select>
+            </div>
+            <div class="style-group">
+              <label>Alinhamento do Texto</label>
+              <select class="style-select" data-property="textAlign">
+                <option value="">Esquerda</option>
+                <option value="center">Centro</option>
+                <option value="right">Direita</option>
+                <option value="justify">Justificado</option>
+              </select>
             </div>
           </div>
         </div>
@@ -206,6 +277,18 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
       case 'size-down':
         const currentSizeDown = parseInt(nodeObj.style.fontSize || '16')
         applyStyle('fontSize', `${Math.max(10, currentSizeDown - 2)}px`)
+        break
+      case 'decoration-none':
+        applyStyle('textDecoration', 'none')
+        break
+      case 'decoration-underline':
+        applyStyle('textDecoration', 'underline')
+        break
+      case 'decoration-overline':
+        applyStyle('textDecoration', 'overline')
+        break
+      case 'decoration-linethrough':
+        applyStyle('textDecoration', 'line-through')
         break
     }
   }
@@ -314,8 +397,41 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     const widthSelect = editorEl.querySelector('[data-property="width"]') as HTMLSelectElement
     if (widthSelect) widthSelect.value = nodeObj.style?.width || ''
     
-    const textDecorationSelect = editorEl.querySelector('[data-property="textDecoration"]') as HTMLSelectElement
-    if (textDecorationSelect) textDecorationSelect.value = nodeObj.style?.textDecoration || 'none'
+    const paddingSelect = editorEl.querySelector('[data-property="padding"]') as HTMLSelectElement
+    if (paddingSelect) paddingSelect.value = nodeObj.style?.padding || ''
+    
+    const borderRadiusSelect = editorEl.querySelector('[data-property="borderRadius"]') as HTMLSelectElement
+    if (borderRadiusSelect) borderRadiusSelect.value = nodeObj.style?.borderRadius || ''
+    
+    const opacitySelect = editorEl.querySelector('[data-property="opacity"]') as HTMLSelectElement
+    if (opacitySelect) opacitySelect.value = nodeObj.style?.opacity || ''
+    
+    const boxShadowSelect = editorEl.querySelector('[data-property="boxShadow"]') as HTMLSelectElement
+    if (boxShadowSelect) boxShadowSelect.value = nodeObj.style?.boxShadow || ''
+    
+    const lineHeightSelect = editorEl.querySelector('[data-property="lineHeight"]') as HTMLSelectElement
+    if (lineHeightSelect) lineHeightSelect.value = nodeObj.style?.lineHeight || ''
+    
+    const textAlignSelect = editorEl.querySelector('[data-property="textAlign"]') as HTMLSelectElement
+    if (textAlignSelect) textAlignSelect.value = nodeObj.style?.textAlign || ''
+    
+    // Update text decoration buttons
+    const decorationBtns = editorEl.querySelectorAll('.decoration-btn')
+    const currentDecoration = nodeObj.style?.textDecoration || 'none'
+    decorationBtns.forEach(btn => {
+      const action = btn.getAttribute('data-action')
+      if (action === 'decoration-none' && currentDecoration === 'none') {
+        btn.classList.add('active')
+      } else if (action === 'decoration-underline' && currentDecoration === 'underline') {
+        btn.classList.add('active')
+      } else if (action === 'decoration-overline' && currentDecoration === 'overline') {
+        btn.classList.add('active')
+      } else if (action === 'decoration-linethrough' && currentDecoration === 'line-through') {
+        btn.classList.add('active')
+      } else {
+        btn.classList.remove('active')
+      }
+    })
   }
 
   // Handle tab switching

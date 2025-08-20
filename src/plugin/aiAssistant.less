@@ -284,3 +284,39 @@
     }
   }
 }
+
+// AI-generated nodes styling
+.ai-generated-node {
+  position: relative;
+  
+  .ai-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    background: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+}
+
+// Toolbar AI button styling
+.mind-elixir-toolbar {
+  #ai-assistant {
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    &:hover {
+      background: rgba(76, 175, 80, 0.1);
+      border-radius: 4px;
+    }
+  }
+}

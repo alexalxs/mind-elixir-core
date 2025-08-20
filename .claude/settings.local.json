@@ -21,7 +21,10 @@
       "mcp__supabase-mindmap__get_anon_key",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(open test-ai-integration.html)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   },

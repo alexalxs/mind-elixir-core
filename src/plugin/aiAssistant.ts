@@ -1,4 +1,6 @@
 import type { MindElixirInstance, NodeObj } from '../types/index'
+import type { Topic } from '../types/dom'
+import type { AINodeObj, AIMode, AIAssistantPayload } from './aiAssistant.types'
 import './aiAssistant.less'
 
 export interface AIAssistantOptions {
@@ -7,13 +9,6 @@ export interface AIAssistantOptions {
   enabled?: boolean
   autoSuggest?: boolean
   maxSuggestions?: number
-}
-
-interface AIMode {
-  id: 'expand' | 'suggest' | 'summarize' | 'question' | 'custom'
-  label: string
-  icon: string
-  description: string
 }
 
 const AI_MODES: AIMode[] = [
@@ -120,6 +115,19 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     await generateSuggestions()
   })
 
+  // Ensure textarea works properly
+  customPromptTextarea.addEventListener('click', (e) => {
+    e.stopPropagation()
+  })
+  
+  customPromptTextarea.addEventListener('keydown', (e) => {
+    e.stopPropagation()
+  })
+  
+  customPromptTextarea.addEventListener('input', (e) => {
+    e.stopPropagation()
+  })
+
   // AI API functions
   async function callAIAssistant(payload: any) {
     const response = await fetch(`${supabaseUrl}/functions/v1/ai-assistant`, {
@@ -149,7 +157,7 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     generateBtn.disabled = true
 
     try {
-      const payload = {
+      const payload: AIAssistantPayload = {
         mindMap: { nodeData: mind.nodeData },
         selectedNodeId: currentNode.id,
         mode: selectedMode,
@@ -157,7 +165,7 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
       }
 
       if (selectedMode === 'custom' && customPromptTextarea.value) {
-        payload['customPrompt'] = customPromptTextarea.value
+        payload.customPrompt = customPromptTextarea.value
       }
 
       const result = await callAIAssistant(payload)
@@ -175,7 +183,32 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
           const addBtn = suggestionItem.querySelector('.ai-suggestion-add') as HTMLButtonElement
           addBtn.addEventListener('click', () => {
             if (currentNode) {
-              mind.addChild(currentNode, suggestion)
+              // Create new node with AI-generated flag
+              const newNode = mind.generateNewObj() as AINodeObj
+              newNode.topic = suggestion
+              newNode.aiGenerated = true // Mark as AI-generated
+              newNode.aiGeneratedAt = new Date().toISOString()
+              newNode.aiMode = selectedMode
+              
+              // Find the current node's topic element
+              const currentNodeEl = mind.findEle(currentNode.id) as Topic
+              if (currentNodeEl) {
+                // Add the node
+                mind.addChild(currentNodeEl, newNode)
+              }
+              
+              // Add visual indicator
+              const newNodeEl = mind.findEle(newNode.id)
+              if (newNodeEl) {
+                newNodeEl.classList.add('ai-generated-node')
+                // Add AI badge
+                const aiBadge = document.createElement('span')
+                aiBadge.className = 'ai-badge'
+                aiBadge.innerHTML = '🤖'
+                aiBadge.title = `AI Generated (${selectedMode})`
+                newNodeEl.appendChild(aiBadge)
+              }
+              
               suggestionItem.classList.add('added')
               addBtn.disabled = true
               addBtn.textContent = '✓'
@@ -198,11 +231,7 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
   }
 
   // Add AI option to context menu
-  const originalShowContextMenu = mind.bus.getListener('showContextMenu')
-  mind.bus.addListener('showContextMenu', (e: MouseEvent, node?: NodeObj) => {
-    if (originalShowContextMenu) {
-      originalShowContextMenu(e, node)
-    }
+  mind.bus.addListener('showContextMenu', (e: MouseEvent) => {
     
     // Add AI assistant option to context menu
     setTimeout(() => {
@@ -213,9 +242,11 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
         aiOption.innerHTML = '🤖 Assistente IA'
         aiOption.addEventListener('click', () => {
           aiPanel.style.display = 'block'
-          if (node) {
-            currentNode = node
-            nodeTopic.textContent = node.topic
+          // Use the current selected node
+          const selectedNode = mind.currentNode
+          if (selectedNode) {
+            currentNode = selectedNode
+            nodeTopic.textContent = selectedNode.topic
             generateBtn.disabled = false
             
             if (autoSuggest) {
@@ -241,6 +272,26 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
 
   // Set default mode
   modeBtns[0].classList.add('active')
+
+  // Listen for toolbar button click
+  mind.bus.addListener('openAIAssistant', () => {
+    aiPanel.style.display = 'block'
+    // Always use the current selected node from mind-elixir
+    const selectedNode = mind.currentNode
+    if (selectedNode) {
+      currentNode = selectedNode
+      nodeTopic.textContent = selectedNode.topic
+      generateBtn.disabled = false
+    } else {
+      // If no node is selected, use the root node
+      const rootNode = mind.nodeData
+      if (rootNode) {
+        currentNode = rootNode
+        nodeTopic.textContent = rootNode.topic
+        generateBtn.disabled = false
+      }
+    }
+  })
 
   // Return cleanup function
   return () => {

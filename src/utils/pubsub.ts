@@ -84,6 +84,7 @@ export type EventMap = {
   updateArrowDelta: (arrow: Arrow) => void
   showContextMenu: (e: MouseEvent) => void
   editStyle: (node: NodeObj) => void
+  openAIAssistant: () => void
 }
 
 export function createBus<T extends Record<string, (...args: any[]) => void> = EventMap>() {
