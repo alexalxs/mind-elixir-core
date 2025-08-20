@@ -1,0 +1,28 @@
+{
+  "mindMap": {
+    "nodeData": {
+      "topic": "Desenvolvimento Web",
+      "id": "root",
+      "children": [
+        {
+          "topic": "Frontend",
+          "id": "n1",
+          "children": [
+            {
+              "topic": "React",
+              "id": "n11"
+            }
+          ]
+        },
+        {
+          "topic": "Backend",
+          "id": "n2"
+        }
+      ]
+    }
+  },
+  "selectedNodeId": "n1",
+  "mode": "expand",
+  "depth": 3
+}
+EOF < /dev/null

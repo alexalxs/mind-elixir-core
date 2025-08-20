@@ -168,15 +168,6 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
             <button class="style-btn size-btn" data-action="size-down">A</button>
             <button class="style-btn size-btn size-up" data-action="size-up">A</button>
           </div>
-          <div class="text-decoration-controls">
-            <label class="decoration-label">Decoração do Texto</label>
-            <div class="decoration-buttons">
-              <button class="style-btn decoration-btn" data-action="decoration-none" title="Sem decoração">A</button>
-              <button class="style-btn decoration-btn" data-action="decoration-underline" title="Sublinhado"><u>A</u></button>
-              <button class="style-btn decoration-btn" data-action="decoration-overline" title="Linha acima"><span style="text-decoration: overline">A</span></button>
-              <button class="style-btn decoration-btn" data-action="decoration-linethrough" title="Riscado"><s>A</s></button>
-            </div>
-          </div>
           <div class="additional-styles">
             <div class="style-group">
               <label>Altura da Linha</label>
@@ -277,18 +268,6 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
       case 'size-down':
         const currentSizeDown = parseInt(nodeObj.style.fontSize || '16')
         applyStyle('fontSize', `${Math.max(10, currentSizeDown - 2)}px`)
-        break
-      case 'decoration-none':
-        applyStyle('textDecoration', 'none')
-        break
-      case 'decoration-underline':
-        applyStyle('textDecoration', 'underline')
-        break
-      case 'decoration-overline':
-        applyStyle('textDecoration', 'overline')
-        break
-      case 'decoration-linethrough':
-        applyStyle('textDecoration', 'line-through')
         break
     }
   }
@@ -415,23 +394,6 @@ export default function styleEditor(mind: MindElixirInstance, options?: StyleEdi
     const textAlignSelect = editorEl.querySelector('[data-property="textAlign"]') as HTMLSelectElement
     if (textAlignSelect) textAlignSelect.value = nodeObj.style?.textAlign || ''
     
-    // Update text decoration buttons
-    const decorationBtns = editorEl.querySelectorAll('.decoration-btn')
-    const currentDecoration = nodeObj.style?.textDecoration || 'none'
-    decorationBtns.forEach(btn => {
-      const action = btn.getAttribute('data-action')
-      if (action === 'decoration-none' && currentDecoration === 'none') {
-        btn.classList.add('active')
-      } else if (action === 'decoration-underline' && currentDecoration === 'underline') {
-        btn.classList.add('active')
-      } else if (action === 'decoration-overline' && currentDecoration === 'overline') {
-        btn.classList.add('active')
-      } else if (action === 'decoration-linethrough' && currentDecoration === 'line-through') {
-        btn.classList.add('active')
-      } else {
-        btn.classList.remove('active')
-      }
-    })
   }
 
   // Handle tab switching

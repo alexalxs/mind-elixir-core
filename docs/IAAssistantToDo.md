@@ -54,45 +54,35 @@ interface MindMapNode {
 
 #### Resposta da API
 
-A API retorna conteúdo gerado pela IA que será processado e formatado pelo cliente:
+A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de nós do Mind Elixir:
 
-**Para modo expand e custom:**
+**Para todos os modos (expand, question e custom):**
 ```json
 {
   "children": [
     {
       "topic": "Conteúdo gerado pela IA",
-      "aiGenerated": true
-    },
-    {
-      "topic": "Outro conteúdo relevante",
-      "aiGenerated": true
+      "id": "ai-generated-uuid",
+      "aiGenerated": true,
+      "children": []  // opcional, usado no modo question para respostas
     }
   ],
-  "mode": "expand",
+  "mode": "expand",  // ou "question" ou "custom"
   "selectedNodeTopic": "Tópico do nó selecionado"
 }
 ```
 
-**Para modo question:**
-```json
-{
-  "children": [
-    {
-      "topic": "Pergunta gerada pela IA?",
-      "aiGenerated": true,
-      "children": [
-        {
-          "topic": "Resposta detalhada baseada no contexto do mapa",
-          "aiGenerated": true
-        }
-      ]
-    }
-  ],
-  "mode": "question",
-  "selectedNodeTopic": "Tópico selecionado"
-}
-```
+**Estrutura de nó obrigatória:**
+- `topic`: string - O texto do nó
+- `id`: string - Identificador único
+- `aiGenerated`: boolean - Sempre true para nós gerados por IA
+
+**Campos opcionais:**
+- `children`: array - Subnós (usado em modo question)
+- `style`: object - Estilos CSS customizados
+- `tags`: array - Tags do nó
+- `image`: object - Imagem anexada
+- `hyperLink`: string - Link externo
 
 **Importante**: A API retorna apenas o conteúdo gerado pela IA. O cliente (plugin frontend) é responsável por:
 - Gerar IDs únicos para cada nó
@@ -112,7 +102,25 @@ Nó selecionado: "{topic}"
 
 Com base no contexto completo do mapa mental e no tópico selecionado, 
 expanda "{topic}" em {depth} subtópicos relevantes que agreguem valor ao conhecimento existente.
-Responda apenas com a lista numerada, um item por linha.
+
+IMPORTANTE: Retorne a resposta em formato JSON válido, seguindo EXATAMENTE a estrutura de nós do Mind Elixir:
+{
+  "children": [
+    {
+      "topic": "Subtópico 1",
+      "id": "generated-1",
+      "aiGenerated": true
+    },
+    {
+      "topic": "Subtópico 2", 
+      "id": "generated-2",
+      "aiGenerated": true
+    }
+  ]
+}
+
+Gere exatamente {depth} subtópicos únicos e relevantes.
+Cada nó deve ter: topic (string), id (string único), aiGenerated (true).
 ```
 
 **2. Modo Question (Perguntas com Respostas)**
@@ -123,11 +131,38 @@ Nó selecionado: "{topic}"
 Com base no contexto completo do mapa mental, gere {depth} perguntas exploratórias 
 sobre "{topic}" que aprofundem o conhecimento, junto com suas respectivas respostas.
 
-Para cada pergunta, formate a resposta como:
-Q: [pergunta]
-A: [resposta concisa]
+IMPORTANTE: Retorne a resposta em formato JSON válido, seguindo EXATAMENTE a estrutura de nós do Mind Elixir:
+{
+  "children": [
+    {
+      "topic": "Pergunta exploratória 1?",
+      "id": "question-1",
+      "aiGenerated": true,
+      "children": [
+        {
+          "topic": "Resposta detalhada e informativa",
+          "id": "answer-1",
+          "aiGenerated": true
+        }
+      ]
+    },
+    {
+      "topic": "Pergunta exploratória 2?",
+      "id": "question-2", 
+      "aiGenerated": true,
+      "children": [
+        {
+          "topic": "Resposta detalhada e informativa",
+          "id": "answer-2",
+          "aiGenerated": true
+        }
+      ]
+    }
+  ]
+}
 
-Separe cada par pergunta-resposta com uma linha em branco.
+Gere exatamente {depth} pares de pergunta-resposta.
+Cada pergunta é um nó pai com sua resposta como nó filho.
 ```
 
 **3. Modo Custom (Personalizado)**
@@ -136,6 +171,21 @@ Você tem acesso ao mapa mental completo em formato JSON.
 Nó selecionado: "{topic}"
 
 {customPrompt fornecido pelo usuário}
+
+IMPORTANTE: Retorne SEMPRE a resposta em formato JSON válido, seguindo EXATAMENTE a estrutura de nós do Mind Elixir:
+{
+  "children": [
+    {
+      "topic": "Conteúdo gerado",
+      "id": "custom-1",
+      "aiGenerated": true,
+      "children": [] // opcional, se necessário criar subnós
+    }
+  ]
+}
+
+Cada nó deve ter obrigatoriamente: topic (string), id (string único), aiGenerated (true).
+Opcionalmente pode ter: children (array de nós filhos), style (objeto com estilos).
 ```
 
 #### Configuração da OpenAI
@@ -148,7 +198,7 @@ Nó selecionado: "{topic}"
 - Limite de payload: 1MB
 - Retorna erro 400 se o nó selecionado não for encontrado
 - Retorna erro se OPENAI_API_KEY não estiver configurada
-- Filtra automaticamente sugestões duplicadas (case insensitive)
+- Valida se o json recebido da open ai cumpre os requisitos de formato
 
 ## Fase 2: Estrutura do Plugin ✅ COMPLETA
 [x] Criar arquivo src/plugin/aiAssistant.ts
@@ -193,37 +243,6 @@ Nó selecionado: "{topic}"
 [x] Fix: Campo Nó selecionado agora atualiza corretamente (adicionado listener para selectNodes)
 [x] Fix: Erro de estrutura circular ao converter para JSON (implementada função cleanNodeData)
 
-## Status dos Testes da API (20/01/2025) ✓ RESOLVIDO
-
-### Problemas Encontrados e Resolvidos
-- ✓ Timeout ao conectar - Resolvido após mudança de IP
-- ✓ Edge function atualizada para versão 7 com nova estrutura
-- ✓ Erro "FindEle: Node not found" - Corrigido alterando método de adição de nós
-
-### API Testada e Funcionando
-- **Modo expand**: Retorna array de nós filhos simples
-- **Modo question**: Retorna perguntas com respostas como nós filhos
-- **Modo custom**: Funciona com prompts personalizados
-
-### Estrutura de Resposta Confirmada
-```json
-{
-  "children": [
-    {
-      "topic": "texto do nó",
-      "aiGenerated": true,
-      "children": [...] // Para modo question com respostas
-    }
-  ],
-  "mode": "expand/question/custom",
-  "selectedNodeTopic": "Tópico selecionado"
-}
-```
-
-### Correções Implementadas
-- Nós são adicionados diretamente na estrutura de dados
-- Visual indicators aplicados após refresh do mapa
-- Uso de `mind.refresh()` ao invés de `linkDiv.refresh()`
 
 ## Melhorias Futuras
 [ ] Implementar histórico de sugestões

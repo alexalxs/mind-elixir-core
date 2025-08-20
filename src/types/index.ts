@@ -171,7 +171,6 @@ export interface NodeObj {
     fontStyle?: string
     width: string
     border: string
-    textDecoration: string
     padding?: string
     borderRadius?: string
     opacity?: string
