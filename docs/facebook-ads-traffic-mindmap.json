@@ -1,0 +1,476 @@
+{
+  "nodeData": {
+    "id": "root",
+    "topic": "Tráfego Pago Facebook Ads",
+    "root": true,
+    "style": {
+      "fontSize": "20px",
+      "fontWeight": "bold",
+      "color": "#fff",
+      "background": "#1877F2"
+    },
+    "children": [
+      {
+        "id": "estrutura",
+        "topic": "Estrutura de Campanhas",
+        "style": {
+          "background": "#42B883",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "camp1",
+            "topic": "Níveis de Estrutura",
+            "children": [
+              {
+                "id": "camp1-1",
+                "topic": "Campanha (Objetivo)",
+                "tags": ["fundamental"]
+              },
+              {
+                "id": "camp1-2",
+                "topic": "Conjunto de Anúncios (Segmentação)",
+                "tags": ["fundamental"]
+              },
+              {
+                "id": "camp1-3",
+                "topic": "Anúncios (Criativos)",
+                "tags": ["fundamental"]
+              }
+            ]
+          },
+          {
+            "id": "camp2",
+            "topic": "Objetivos de Campanha",
+            "style": {
+              "background": "#E3F2FD"
+            },
+            "children": [
+              {
+                "id": "camp2-1",
+                "topic": "Reconhecimento",
+                "children": [
+                  {"id": "rec1", "topic": "Alcance"},
+                  {"id": "rec2", "topic": "Reconhecimento da marca"}
+                ]
+              },
+              {
+                "id": "camp2-2",
+                "topic": "Consideração",
+                "children": [
+                  {"id": "con1", "topic": "Tráfego"},
+                  {"id": "con2", "topic": "Engajamento"},
+                  {"id": "con3", "topic": "Visualizações de vídeo"},
+                  {"id": "con4", "topic": "Geração de leads"},
+                  {"id": "con5", "topic": "Mensagens"}
+                ]
+              },
+              {
+                "id": "camp2-3",
+                "topic": "Conversão",
+                "style": {
+                  "background": "#C8E6C9",
+                  "fontWeight": "bold"
+                },
+                "children": [
+                  {"id": "conv1", "topic": "Conversões"},
+                  {"id": "conv2", "topic": "Vendas do catálogo"},
+                  {"id": "conv3", "topic": "Visitas ao estabelecimento"}
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "segmentacao",
+        "topic": "Segmentação Avançada",
+        "style": {
+          "background": "#FF6B6B",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "seg1",
+            "topic": "Dados Demográficos",
+            "children": [
+              {"id": "demo1", "topic": "Idade e Gênero"},
+              {"id": "demo2", "topic": "Localização (Cidade, Estado, País)"},
+              {"id": "demo3", "topic": "Idioma"},
+              {"id": "demo4", "topic": "Formação e Trabalho"}
+            ]
+          },
+          {
+            "id": "seg2",
+            "topic": "Interesses e Comportamentos",
+            "style": {
+              "background": "#FFE0B2"
+            },
+            "children": [
+              {"id": "int1", "topic": "Interesses específicos"},
+              {"id": "int2", "topic": "Comportamento de compra"},
+              {"id": "int3", "topic": "Dispositivos utilizados"},
+              {"id": "int4", "topic": "Atividades digitais"}
+            ]
+          },
+          {
+            "id": "seg3",
+            "topic": "Públicos Personalizados",
+            "style": {
+              "background": "#D1C4E9",
+              "fontWeight": "bold"
+            },
+            "children": [
+              {
+                "id": "pub1",
+                "topic": "Lista de E-mails/Telefones",
+                "tags": ["alta-conversão"]
+              },
+              {
+                "id": "pub2",
+                "topic": "Visitantes do Site (Pixel)",
+                "tags": ["alta-conversão"]
+              },
+              {
+                "id": "pub3",
+                "topic": "Engajamento (Página, Instagram, Vídeos)",
+                "tags": ["warm-audience"]
+              },
+              {
+                "id": "pub4",
+                "topic": "Lookalike (1-10%)",
+                "tags": ["escalabilidade"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "criativos",
+        "topic": "Criativos que Convertem",
+        "style": {
+          "background": "#4ECDC4",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "cri1",
+            "topic": "Formatos de Anúncio",
+            "children": [
+              {"id": "for1", "topic": "Imagem única"},
+              {"id": "for2", "topic": "Carrossel (2-10 cards)"},
+              {"id": "for3", "topic": "Vídeo (15s-240s)"},
+              {"id": "for4", "topic": "Coleção"},
+              {"id": "for5", "topic": "Stories/Reels"}
+            ]
+          },
+          {
+            "id": "cri2",
+            "topic": "Copy Persuasiva",
+            "style": {
+              "background": "#B2DFDB"
+            },
+            "children": [
+              {"id": "copy1", "topic": "Headline impactante (125 caracteres)"},
+              {"id": "copy2", "topic": "Texto principal (125-250 caracteres)"},
+              {"id": "copy3", "topic": "CTA claro e direto"},
+              {"id": "copy4", "topic": "Prova social e urgência"},
+              {"id": "copy5", "topic": "Benefícios > Características"}
+            ]
+          },
+          {
+            "id": "cri3",
+            "topic": "Design e Vídeo",
+            "style": {
+              "background": "#FFCCBC"
+            },
+            "children": [
+              {"id": "des1", "topic": "Thumb scroll-stopping"},
+              {"id": "des2", "topic": "Primeiros 3 segundos cruciais"},
+              {"id": "des3", "topic": "Legendas em vídeos"},
+              {"id": "des4", "topic": "Cores contrastantes"},
+              {"id": "des5", "topic": "Mobile-first (9:16, 1:1)"}
+            ]
+          }
+        ]
+      },
+      {
+        "id": "metricas",
+        "topic": "Métricas e Otimização",
+        "style": {
+          "background": "#9C27B0",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "met1",
+            "topic": "KPIs Principais",
+            "style": {
+              "background": "#E1BEE7"
+            },
+            "children": [
+              {"id": "kpi1", "topic": "CPM (Custo por Mil)"},
+              {"id": "kpi2", "topic": "CPC (Custo por Clique)"},
+              {"id": "kpi3", "topic": "CTR (Taxa de Cliques)"},
+              {"id": "kpi4", "topic": "CPA (Custo por Aquisição)"},
+              {"id": "kpi5", "topic": "ROAS (Retorno sobre Investimento)"}
+            ]
+          },
+          {
+            "id": "met2",
+            "topic": "Otimização de Campanhas",
+            "children": [
+              {"id": "opt1", "topic": "Teste A/B (criativos, copy, públicos)"},
+              {"id": "opt2", "topic": "Análise de horários e dias"},
+              {"id": "opt3", "topic": "Ajuste de lances"},
+              {"id": "opt4", "topic": "Exclusão de públicos"},
+              {"id": "opt5", "topic": "Scaling vertical e horizontal"}
+            ]
+          },
+          {
+            "id": "met3",
+            "topic": "Fase de Aprendizado",
+            "style": {
+              "background": "#F8BBD0"
+            },
+            "children": [
+              {"id": "apr1", "topic": "50 conversões em 7 dias"},
+              {"id": "apr2", "topic": "Evitar edições frequentes"},
+              {"id": "apr3", "topic": "Budget mínimo adequado"}
+            ]
+          }
+        ]
+      },
+      {
+        "id": "estrategias",
+        "topic": "Estratégias Avançadas",
+        "style": {
+          "background": "#FF5722",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "est1",
+            "topic": "Funil de Vendas",
+            "style": {
+              "background": "#FFEBEE",
+              "color": "#333"
+            },
+            "children": [
+              {
+                "id": "fun1",
+                "topic": "TOFU - Topo do Funil",
+                "children": [
+                  {"id": "tofu1", "topic": "Conteúdo educativo"},
+                  {"id": "tofu2", "topic": "Vídeos curtos"},
+                  {"id": "tofu3", "topic": "Lead magnets"}
+                ]
+              },
+              {
+                "id": "fun2",
+                "topic": "MOFU - Meio do Funil",
+                "children": [
+                  {"id": "mofu1", "topic": "Remarketing de conteúdo"},
+                  {"id": "mofu2", "topic": "Webinars"},
+                  {"id": "mofu3", "topic": "Demonstrações"}
+                ]
+              },
+              {
+                "id": "fun3",
+                "topic": "BOFU - Fundo do Funil",
+                "style": {
+                  "fontWeight": "bold"
+                },
+                "children": [
+                  {"id": "bofu1", "topic": "Ofertas limitadas"},
+                  {"id": "bofu2", "topic": "Remarketing agressivo"},
+                  {"id": "bofu3", "topic": "Provas sociais"}
+                ]
+              }
+            ]
+          },
+          {
+            "id": "est2",
+            "topic": "Campaign Budget Optimization (CBO)",
+            "tags": ["essencial"],
+            "children": [
+              {"id": "cbo1", "topic": "Budget no nível da campanha"},
+              {"id": "cbo2", "topic": "3-5 conjuntos por campanha"},
+              {"id": "cbo3", "topic": "Deixar algoritmo otimizar"}
+            ]
+          },
+          {
+            "id": "est3",
+            "topic": "Estrutura de Scaling",
+            "children": [
+              {"id": "sca1", "topic": "Campanha de Teste (baixo budget)"},
+              {"id": "sca2", "topic": "Campanha de Scale (winners)"},
+              {"id": "sca3", "topic": "Campanha Evergreen (consistentes)"}
+            ]
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "topic": "Políticas e Compliance",
+        "style": {
+          "background": "#795548",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "pol1",
+            "topic": "Produtos Restritos",
+            "style": {
+              "background": "#FFCDD2",
+              "color": "#333"
+            },
+            "children": [
+              {"id": "res1", "topic": "Suplementos (claims médicos)"},
+              {"id": "res2", "topic": "Produtos financeiros"},
+              {"id": "res3", "topic": "Álcool e tabaco"},
+              {"id": "res4", "topic": "Conteúdo adulto"}
+            ]
+          },
+          {
+            "id": "pol2",
+            "topic": "Boas Práticas",
+            "children": [
+              {"id": "bp1", "topic": "Imagens sem muito texto (20%)"},
+              {"id": "bp2", "topic": "Landing pages funcionais"},
+              {"id": "bp3", "topic": "Políticas de privacidade"},
+              {"id": "bp4", "topic": "Evitar clickbait"},
+              {"id": "bp5", "topic": "Disclaimers necessários"}
+            ]
+          },
+          {
+            "id": "pol3",
+            "topic": "Conta de Anúncios",
+            "style": {
+              "background": "#D7CCC8"
+            },
+            "children": [
+              {"id": "conta1", "topic": "Verificação de domínio"},
+              {"id": "conta2", "topic": "Business Manager organizado"},
+              {"id": "conta3", "topic": "Formas de pagamento backup"},
+              {"id": "conta4", "topic": "Limite de gasto gradual"}
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ferramentas",
+        "topic": "Ferramentas Essenciais",
+        "style": {
+          "background": "#607D8B",
+          "color": "#fff",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "fer1",
+            "topic": "Facebook Business Suite",
+            "children": [
+              {"id": "fb1", "topic": "Gerenciador de Anúncios"},
+              {"id": "fb2", "topic": "Gerenciador de Públicos"},
+              {"id": "fb3", "topic": "Eventos do Pixel"},
+              {"id": "fb4", "topic": "Biblioteca de Anúncios"}
+            ]
+          },
+          {
+            "id": "fer2",
+            "topic": "Ferramentas de Análise",
+            "children": [
+              {"id": "ana1", "topic": "Facebook Analytics"},
+              {"id": "ana2", "topic": "Google Analytics"},
+              {"id": "ana3", "topic": "Hotjar/Clarity"},
+              {"id": "ana4", "topic": "Triple Whale (e-commerce)"}
+            ]
+          },
+          {
+            "id": "fer3",
+            "topic": "Criação de Conteúdo",
+            "children": [
+              {"id": "cri1", "topic": "Canva/Figma"},
+              {"id": "cri2", "topic": "Clipchamp/CapCut"},
+              {"id": "cri3", "topic": "Copy.ai/Jasper"},
+              {"id": "cri4", "topic": "Unsplash/Pexels"}
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "arrows": [
+    {
+      "id": "arrow1",
+      "from": "pub2",
+      "to": "met3",
+      "text": "Pixel tracking essencial",
+      "color": "#4CAF50"
+    },
+    {
+      "id": "arrow2",
+      "from": "fun3",
+      "to": "pub1",
+      "text": "Usar lista de clientes",
+      "color": "#2196F3"
+    },
+    {
+      "id": "arrow3",
+      "from": "cri2",
+      "to": "pol2",
+      "text": "Seguir políticas",
+      "color": "#FF5722"
+    },
+    {
+      "id": "arrow4",
+      "from": "met1",
+      "to": "est3",
+      "text": "KPIs guiam scaling",
+      "color": "#9C27B0"
+    }
+  ],
+  "summaries": [
+    {
+      "id": "sum1",
+      "from": "demo1",
+      "to": "demo4",
+      "text": "Targeting Básico"
+    },
+    {
+      "id": "sum2",
+      "from": "kpi1",
+      "to": "kpi5",
+      "text": "Métricas de Performance"
+    },
+    {
+      "id": "sum3",
+      "from": "tofu1",
+      "to": "bofu3",
+      "text": "Jornada Completa"
+    }
+  ],
+  "direction": 2,
+  "theme": {
+    "name": "Facebook Ads Pro",
+    "palette": [
+      "#1877F2",
+      "#42B883",
+      "#FF6B6B",
+      "#4ECDC4"
+    ],
+    "cssVar": {
+      "--main-color": "#1877F2",
+      "--main-bgcolor": "#f0f2f5",
+      "--color": "#1c1e21",
+      "--bgcolor": "#ffffff"
+    }
+  }
+}
