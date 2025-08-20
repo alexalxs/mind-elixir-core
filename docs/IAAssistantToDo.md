@@ -240,8 +240,8 @@ Opcionalmente pode ter: children (array de nós filhos), style (objeto com estil
 [x] Adicionar botão IA na toolbar principal
 [x] Marcar nós criados por IA com propriedade especial
 [x] Adicionar ícone/badge visual nos nós gerados por IA
-[x] Fix: Campo Nó selecionado agora atualiza corretamente (adicionado listener para selectNodes)
-[x] Fix: Erro de estrutura circular ao converter para JSON (implementada função cleanNodeData)
+[x] Ao selecionar um nó e clicar no botão de agente ele deve considerar esse nó como o nó selecionado e não o nó raiz.
+[x] Script de otimização criado em tests/optimize-ai-prompts.ts para testar variações de prompts
 
 
 ## Melhorias Futuras

@@ -343,20 +343,42 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
   // Listen for toolbar button click
   mind.bus.addListener('openAIAssistant', () => {
     aiPanel.style.display = 'block'
-    // Always use the current selected node from mind-elixir
-    const selectedNode = mind.currentNode
-    if (selectedNode && selectedNode.nodeObj) {
-      currentNode = selectedNode.nodeObj
-      nodeTopic.textContent = selectedNode.nodeObj.topic
-      generateBtn.disabled = false
-    } else {
-      // If no node is selected, use the root node
-      const rootNode = mind.nodeData
-      if (rootNode) {
-        currentNode = rootNode
-        nodeTopic.textContent = rootNode.topic
-        generateBtn.disabled = false
+    
+    // Get the currently selected nodes from mind.currentNodes array
+    if (mind.currentNodes && mind.currentNodes.length > 0) {
+      // Get the node object from the selected topic element
+      const selectedTopicEl = mind.currentNodes[mind.currentNodes.length - 1]
+      const nodeId = selectedTopicEl.dataset.nodeid
+      
+      if (nodeId) {
+        // Find the node object by ID
+        const findNode = (node: NodeObj, id: string): NodeObj | null => {
+          if (node.id === id) return node
+          if (node.children) {
+            for (const child of node.children) {
+              const found = findNode(child, id)
+              if (found) return found
+            }
+          }
+          return null
+        }
+        
+        const selectedNodeObj = findNode(mind.nodeData, nodeId)
+        if (selectedNodeObj) {
+          currentNode = selectedNodeObj
+          nodeTopic.textContent = selectedNodeObj.topic
+          generateBtn.disabled = false
+          return
+        }
       }
+    }
+    
+    // Fallback: if no node is selected, use the root node
+    const rootNode = mind.nodeData
+    if (rootNode) {
+      currentNode = rootNode
+      nodeTopic.textContent = rootNode.topic
+      generateBtn.disabled = false
     }
   })
 
