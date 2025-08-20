@@ -1,38 +1,22 @@
-# Node Editor ToDo
+# Sistema de Aplicação de Estilos - ToDo por Fases
 
-## Funcionalidades de Edição Existentes:
-[x] Edição inline de texto do nó (editTopic)
-[x] Alteração de propriedades via reshapeNode
-[ ] Interface visual para edição de propriedades
-
-## Interface de Usuário:
+## Fase 1 - Interface Básica de Estilos:
 [ ] Modal/painel para edição de propriedades do nó
-[ ] Editor de notas expandidas
+[ ] Campos para propriedades de estilo existentes (fontSize, color, background, fontWeight, border)
 [ ] Seletores de cor para background e texto
-[ ] Seletor de fonte e tamanho
-[ ] Interface para adicionar/remover tags
-[ ] Interface para adicionar/remover ícones
+[ ] Dropdown para família de fonte
+[ ] Input numérico para tamanho de fonte
+[ ] Botões para peso da fonte (normal/bold)
+[ ] Preview em tempo real das mudanças
+[ ] Integração com reshapeNode() para aplicar mudanças
 
-## Integração com Context Menu:
-[ ] Substituir placeholder "extend menu" por funcionalidade real
-[ ] Adicionar opção "Editar Propriedades"
-[ ] Adicionar opção "Editar Nota"
-[ ] Adicionar opção "Estilos do Nó"
+## Fase 2 - Editor de Formatação Rica:
+[ ] Toolbar WYSIWYG com botões de formatação (B, I, U, etc)
+[ ] Suporte para formatação parcial do texto (negrito em palavras específicas)
+[ ] Implementar sanitização com DOMPurify
+[ ] Campo de edição que gera HTML formatado
+[ ] Salvar conteúdo formatado em dangerouslySetInnerHTML
+[ ] Toggle entre modo texto simples e formatado
+[ ] Preview do HTML resultante
+[ ] Migração de ícones/tags para dentro do HTML quando usar formatação rica
 
-## Funcionalidades de Notas:
-[ ] Campo de nota no editor de propriedades
-[ ] Editor de texto rico ou markdown
-[ ] Indicador visual quando nó tem nota
-[ ] Tooltip para preview da nota
-[ ] Persistência da nota no objeto NodeObj
-
-## Atalhos de Teclado:
-[ ] Atalho para abrir editor de propriedades
-[ ] Atalho para abrir editor de notas
-[ ] Navegação por teclado no editor
-
-## Validação e Persistência:
-[ ] Validação de valores de propriedades
-[ ] Atualização em tempo real no mapa
-[ ] Integração com sistema de undo/redo
-[ ] Eventos para mudanças de propriedades

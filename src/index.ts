@@ -11,6 +11,8 @@ import { sub, main } from './utils/generateBranch'
 // @ts-expect-error json file
 import { version } from '../package.json'
 import { createDragMoveHelper } from './utils/dragMoveHelper'
+import nodeEditor from './plugin/nodeEditor'
+import './plugin/nodeEditor.less'
 import type { Topic } from './docs'
 
 // TODO show up animation
@@ -122,6 +124,7 @@ function MindElixir(
     this.container.style.overflow = 'hidden'
   } else {
     this.disposable.push(initMouseEvent(this))
+    nodeEditor(this)
   }
 }
 

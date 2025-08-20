@@ -58,3 +58,6 @@ Consultando o Código criei na pasta de documentações o diagarma de sequencia 
 
 - Quando for necessário ou solicitado a iniciar um servidor:
 . Sempre verifique primeiro se o processo desejado já esta em execução na porta especificada no projeto e se isso ocorre use esse processo evitando criar um novo processo ou mudar de porta;
+
+
+- Quando for iniciar o supabase não use docker pois sempre vamos usar o supabase no site supabase. Use apenas o supabase cli.

@@ -1,6 +1,6 @@
 import i18n from '../i18n'
 import type { Topic } from '../types/dom'
-import type { MindElixirInstance } from '../types/index'
+import type { MindElixirInstance, NodeObj } from '../types/index'
 import { encodeHTML, isTopic } from '../utils/index'
 import './contextMenu.less'
 import type { ArrowOptions } from '../arrow'
@@ -48,6 +48,7 @@ export default function (mind: MindElixirInstance, option: true | ContextMenuOpt
   const link = createLi('cm-link', lang.link, '')
   const linkBidirectional = createLi('cm-link-bidirectional', lang.linkBidirectional, '')
   const summary = createLi('cm-summary', lang.summary, '')
+  const edit_style = createLi('cm-edit_style', 'Edit Style', '')
 
   const menuUl = document.createElement('ul')
   menuUl.className = 'menu-list'
@@ -66,6 +67,7 @@ export default function (mind: MindElixirInstance, option: true | ContextMenuOpt
     menuUl.appendChild(link)
     menuUl.appendChild(linkBidirectional)
   }
+  menuUl.appendChild(edit_style)
   if (option && option.extend) {
     for (let i = 0; i < option.extend.length; i++) {
       const item = option.extend[i]
@@ -180,6 +182,13 @@ export default function (mind: MindElixirInstance, option: true | ContextMenuOpt
   down.onclick = () => {
     if (isRoot) return
     mind.moveDownNode()
+    menuContainer.hidden = true
+  }
+  edit_style.onclick = () => {
+    const node = mind.currentNode
+    if (node) {
+      mind.bus.fire('editStyle', node.nodeObj)
+    }
     menuContainer.hidden = true
   }
   const linkFunc = (options?: ArrowOptions) => {
