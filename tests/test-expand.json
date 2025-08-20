@@ -1,0 +1,24 @@
+{
+  "mindMap": {
+    "nodeData": {
+      "topic": "Marketing Digital",
+      "id": "root",
+      "children": [
+        {
+          "topic": "SEO",
+          "id": "n1",
+          "children": []
+        },
+        {
+          "topic": "Social Media",
+          "id": "n2",
+          "children": []
+        }
+      ]
+    }
+  },
+  "selectedNodeId": "root",
+  "mode": "expand",
+  "depth": 3
+}
+EOF < /dev/null
