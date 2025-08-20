@@ -38,7 +38,22 @@ interface RequestPayload {
   selectedNodeId: string   // ID do nó selecionado (ponto focal para geração)
   mode: 'expand' | 'question' | 'custom'
   depth?: number          // Número de itens a gerar (padrão: 5)
-  customPrompt?: string   // Prompt customizado (apenas para mode='custom')
+  customPrompt?: string   // Prompt customizado (agora disponível para TODOS os modos)
+  
+  // Configurações OpenAI (opcionais)
+  openAIConfig?: {
+    model?: string         // Modelo a usar (padrão: 'gpt-3.5-turbo')
+    temperature?: number   // Criatividade 0-2 (padrão: 0.7)
+    maxTokens?: number    // Limite de tokens (padrão: 2000)
+  }
+  
+  // Configurações de detalhamento (opcionais)
+  detailConfig?: {
+    minWordsPerTopic?: number    // Mínimo de palavras por tópico (padrão: 5)
+    maxWordsPerTopic?: number    // Máximo de palavras por tópico (padrão: 10)
+    minWordsPerAnswer?: number   // Mínimo de palavras por resposta (padrão: 30)
+    maxWordsPerAnswer?: number   // Máximo de palavras por resposta (padrão: 100)
+  }
 }
 ```
 
@@ -95,6 +110,16 @@ A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de n
 
 A função envia o mapa mental completo como contexto para a IA, permitindo que ela compreenda toda a estrutura e relações do conhecimento. O mapa completo é enviado no payload junto com o ID do nó selecionado.
 
+**IMPORTANTE**: A Edge Function agora funciona como um **intermediário transparente** entre o cliente e a OpenAI:
+- O cliente tem controle TOTAL sobre o prompt, modelo, temperatura, tokens e configurações de detalhamento
+- A função apenas repassa as configurações recebidas para a OpenAI, sem adicionar ou modificar nada
+- O campo `customPrompt` quando fornecido substitui COMPLETAMENTE o prompt padrão
+- O cliente é responsável por incluir TODAS as instruções necessárias, incluindo formato JSON se desejado
+- Isso permite experimentação e otimização completa sem necessidade de fazer deploy da função
+- A função é stateless e não mantém configurações próprias
+
+**Prompts Padrão (usados quando customPrompt NÃO é fornecido):**
+
 **1. Modo Expand (Expandir)**
 ```
 Você tem acesso ao mapa mental completo em formato JSON.
@@ -103,6 +128,12 @@ Nó selecionado: "{topic}"
 Com base no contexto completo do mapa mental e no tópico selecionado, 
 expanda "{topic}" em {depth} subtópicos relevantes que agreguem valor ao conhecimento existente.
 
+CADA SUBTÓPICO DEVE:
+- Ter entre {minWordsPerTopic}-{maxWordsPerTopic} palavras
+- Ser uma frase descritiva completa
+- Explicar claramente um conceito, funcionalidade ou aspecto específico
+- Não ser apenas uma palavra ou termo isolado
+
 IMPORTANTE: Retorne a resposta em formato JSON válido, seguindo EXATAMENTE a estrutura de nós do Mind Elixir:
 {
   "children": [
@@ -110,16 +141,11 @@ IMPORTANTE: Retorne a resposta em formato JSON válido, seguindo EXATAMENTE a es
       "topic": "Subtópico 1",
       "id": "generated-1",
       "aiGenerated": true
-    },
-    {
-      "topic": "Subtópico 2", 
-      "id": "generated-2",
-      "aiGenerated": true
     }
   ]
 }
 
-Gere exatamente {depth} subtópicos únicos e relevantes.
+Gere exatamente {depth} subtópicos únicos, relevantes e DETALHADOS.
 Cada nó deve ter: topic (string), id (string único), aiGenerated (true).
 ```
 
@@ -189,10 +215,48 @@ Opcionalmente pode ter: children (array de nós filhos), style (objeto com estil
 ```
 
 #### Configuração da OpenAI
-- **Modelo**: gpt-3.5-turbo
-- **Temperature**: 0.7
-- **Max Tokens**: 300
-- **System Message**: "Você é um assistente especializado em criar mapas mentais. Você recebe o contexto completo do mapa mental e deve gerar conteúdo relevante que agregue valor ao conhecimento existente."
+
+As configurações da OpenAI agora são **dinâmicas e configuráveis** via payload da requisição:
+
+**Configurações OpenAI (openAIConfig):**
+- **model**: Modelo da OpenAI a usar
+  - Padrão: `'gpt-3.5-turbo'`
+  - Opções: `'gpt-3.5-turbo'`, `'gpt-4'`, `'gpt-4-turbo-preview'`
+- **temperature**: Controla a criatividade/aleatoriedade (0-2)
+  - Padrão: `0.7`
+  - 0 = Mais determinístico, 2 = Mais criativo
+- **maxTokens**: Limite máximo de tokens na resposta
+  - Padrão: `2000`
+  - Recomendado: 1000-4000 para respostas detalhadas
+
+**Configurações de Detalhamento (detailConfig):**
+- **minWordsPerTopic**: Mínimo de palavras por tópico (modo expand)
+  - Padrão: `5`
+- **maxWordsPerTopic**: Máximo de palavras por tópico (modo expand)
+  - Padrão: `10`
+- **minWordsPerAnswer**: Mínimo de palavras por resposta (modo question)
+  - Padrão: `30`
+- **maxWordsPerAnswer**: Máximo de palavras por resposta (modo question)
+  - Padrão: `100`
+
+**Exemplo de requisição com configurações customizadas:**
+```json
+{
+  "mindMap": { ... },
+  "selectedNodeId": "react",
+  "mode": "expand",
+  "depth": 3,
+  "openAIConfig": {
+    "model": "gpt-4-turbo-preview",
+    "temperature": 0.8,
+    "maxTokens": 3000
+  },
+  "detailConfig": {
+    "minWordsPerTopic": 8,
+    "maxWordsPerTopic": 15
+  }
+}
+```
 
 #### Tratamento de Erros
 - Limite de payload: 1MB
@@ -240,8 +304,12 @@ Opcionalmente pode ter: children (array de nós filhos), style (objeto com estil
 [x] Adicionar botão IA na toolbar principal
 [x] Marcar nós criados por IA com propriedade especial
 [x] Adicionar ícone/badge visual nos nós gerados por IA
-[x] Ao selecionar um nó e clicar no botão de agente ele deve considerar esse nó como o nó selecionado e não o nó raiz.
+[x] Ao selecionar um nó e clicar no botão de agente ele deve considerar esse nó como o nó selecionado e não o nó raiz. Por outro lado já esta funcionando corretamente o cenário onde o Agente já esta ativado e o usuário clicar em outro nó. 
 [x] Script de otimização criado em tests/optimize-ai-prompts.ts para testar variações de prompts
+[x] Campo de prompt customizado na interface para todos os modos
+[Fix] O campo prompt deve ser levado em consideração nas requisições,  pois ao pedir para expandir ignora o prompt customizado e sempre gera 5 filhos.
+[x] O componente de Ai Assistent deve ser modificado para se tornar uma aba junto com o componente de edição de nós e textos e ambos devem ficar ativados desde o carregamento da aplicação.
+[Fix] O modelo da open ai, max_tokens, temperature, instruções sobre o detalhamento , número de palavras, é passado na requisição, respeito ao modelo de json.
 
 
 ## Melhorias Futuras
