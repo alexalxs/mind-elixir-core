@@ -10,6 +10,7 @@ import katex from '../katex.css?raw'
 import { layoutSSR, renderSSRHTML } from './utils/layout-ssr'
 import { snapdom } from '@zumer/snapdom'
 import styleEditor from './plugin/styleEditor'
+import aiAssistant from './plugin/aiAssistant'
 
 interface Window {
   m?: MindElixirInstance
@@ -84,6 +85,12 @@ mind.init(example)
 
 // Initialize style editor
 styleEditor(mind)
+
+// Initialize AI assistant
+aiAssistant(mind, {
+  enabled: true,
+  autoSuggest: false
+})
 
 function sleep() {
   return new Promise<void>(res => {

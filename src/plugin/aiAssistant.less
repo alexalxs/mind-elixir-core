@@ -1,0 +1,286 @@
+.ai-assistant-panel {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  .ai-assistant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f5f5f5;
+    border-radius: 8px 8px 0 0;
+    
+    .ai-assistant-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .ai-assistant-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #666;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+  
+  .ai-assistant-content {
+    padding: 16px;
+    
+    .ai-current-node {
+      margin-bottom: 16px;
+      
+      label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+      
+      .ai-node-topic {
+        font-size: 14px;
+        color: #333;
+        font-weight: 500;
+        display: block;
+        padding: 8px;
+        background: #f8f8f8;
+        border-radius: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    
+    .ai-modes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+      
+      .ai-mode-btn {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        
+        &:hover {
+          border-color: #4CAF50;
+          background: #f5f5f5;
+        }
+        
+        &.active {
+          background: #4CAF50;
+          border-color: #4CAF50;
+          color: white;
+          
+          .ai-mode-label {
+            color: white;
+          }
+        }
+        
+        .ai-mode-icon {
+          font-size: 20px;
+        }
+        
+        .ai-mode-label {
+          font-size: 11px;
+          color: #666;
+        }
+      }
+    }
+    
+    .ai-custom-prompt {
+      margin-bottom: 16px;
+      
+      textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 13px;
+        resize: vertical;
+        min-height: 60px;
+        font-family: inherit;
+        
+        &:focus {
+          outline: none;
+          border-color: #4CAF50;
+        }
+      }
+    }
+    
+    .ai-suggestions {
+      .ai-suggestions-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        
+        label {
+          font-size: 12px;
+          color: #666;
+        }
+        
+        .ai-generate-btn {
+          background: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 6px 12px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          
+          &:hover:not(:disabled) {
+            background: #45a049;
+          }
+          
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
+      
+      .ai-suggestions-list {
+        max-height: 200px;
+        overflow-y: auto;
+        
+        .ai-suggestion-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px;
+          margin-bottom: 4px;
+          background: #f8f8f8;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+          
+          &:hover {
+            background: #f0f0f0;
+          }
+          
+          &.added {
+            opacity: 0.6;
+            
+            .ai-suggestion-text {
+              text-decoration: line-through;
+            }
+          }
+          
+          .ai-suggestion-text {
+            font-size: 13px;
+            color: #333;
+            flex: 1;
+            margin-right: 8px;
+          }
+          
+          .ai-suggestion-add {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            
+            &:hover:not(:disabled) {
+              background: #45a049;
+            }
+            
+            &:disabled {
+              background: #ccc;
+              cursor: not-allowed;
+            }
+          }
+        }
+        
+        .ai-no-suggestions,
+        .ai-error {
+          text-align: center;
+          padding: 16px;
+          font-size: 13px;
+          color: #666;
+        }
+        
+        .ai-error {
+          color: #f44336;
+          background: #ffebee;
+          border-radius: 4px;
+        }
+      }
+    }
+    
+    .ai-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      
+      .ai-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #4CAF50;
+        border-radius: 50%;
+        animation: ai-spin 1s linear infinite;
+        margin-bottom: 12px;
+      }
+      
+      span {
+        font-size: 13px;
+        color: #666;
+      }
+    }
+  }
+}
+
+@keyframes ai-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Context menu integration
+.context-menu {
+  .ai-context-option {
+    cursor: pointer;
+    padding: 8px 16px;
+    
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}

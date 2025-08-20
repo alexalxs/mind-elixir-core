@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Integração IA - Mind Elixir</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    #instructions {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    #instructions h2 {
+      margin-top: 0;
+    }
+    #instructions ol {
+      line-height: 1.8;
+    }
+    #instructions code {
+      background: #e0e0e0;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Teste de Integração - Assistente IA Mind Elixir</h1>
+  
+  <div id="instructions">
+    <h2>📋 Instruções de Teste</h2>
+    <ol>
+      <li><strong>Abrir o projeto:</strong> Acesse <a href="http://localhost:23333/" target="_blank">http://localhost:23333/</a></li>
+      <li><strong>Acessar o Assistente IA:</strong>
+        <ul>
+          <li>Clique com o botão direito em qualquer nó do mapa mental</li>
+          <li>Selecione "🤖 Assistente IA" no menu de contexto</li>
+        </ul>
+      </li>
+      <li><strong>Testar os modos:</strong>
+        <ul>
+          <li><strong>🌱 Expandir:</strong> Gera subtópicos para o nó selecionado</li>
+          <li><strong>💡 Sugerir:</strong> Sugere ideias relacionadas</li>
+          <li><strong>📝 Resumir:</strong> Cria um resumo do ramo</li>
+          <li><strong>❓ Perguntas:</strong> Gera perguntas exploratórias</li>
+          <li><strong>✨ Personalizado:</strong> Permite usar um prompt customizado</li>
+        </ul>
+      </li>
+      <li><strong>Aplicar sugestões:</strong> Clique no botão <code>+</code> ao lado de cada sugestão para adicioná-la como filho do nó</li>
+    </ol>
+    
+    <h3>🔍 O que verificar:</h3>
+    <ul>
+      <li>✅ O painel do assistente IA aparece corretamente</li>
+      <li>✅ O nó selecionado é exibido no painel</li>
+      <li>✅ As sugestões são geradas sem duplicar tópicos existentes</li>
+      <li>✅ As sugestões podem ser adicionadas ao mapa mental</li>
+      <li>✅ O modo personalizado permite inserir prompts customizados</li>
+      <li>✅ O indicador de carregamento aparece durante a geração</li>
+    </ul>
+    
+    <h3>⚠️ Possíveis problemas:</h3>
+    <ul>
+      <li>Se receber erro de CORS, verifique se a edge function está configurada corretamente</li>
+      <li>Se receber erro de API key, confirme se a OPENAI_API_KEY está configurada no Supabase</li>
+    </ul>
+  </div>
+  
+  <p style="text-align: center;">
+    <a href="http://localhost:23333/" target="_blank" style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+      🚀 Abrir Mind Elixir
+    </a>
+  </p>
+</body>
+</html>

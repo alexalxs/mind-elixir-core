@@ -19,7 +19,9 @@
       "Bash(node:*)",
       "mcp__supabase-mindmap__get_logs",
       "mcp__supabase-mindmap__get_anon_key",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   },
