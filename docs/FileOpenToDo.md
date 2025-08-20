@@ -19,3 +19,4 @@
 - [ ] Integrar com instance.refresh() existente
 - [ ] Testar carregamento e centralização do mapa
 - [ ] Verificar preservação de arrows e summaries ao importar
+- [ ] Crie na pasta /docs um arquivo .json com um mapa mental completo com vários estilo de nó para ser importado

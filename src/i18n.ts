@@ -12,6 +12,13 @@ type LangPack = {
   clickTips: string
   summary: string
   openFile: string
+  invalidFileType: string
+  fileTooLarge: string
+  invalidJSON: string
+  invalidMindMapStructure: string
+  missingNodeData: string
+  errorReadingFile: string
+  fileLoadedSuccessfully: string
 }
 
 /**
@@ -32,6 +39,13 @@ const cn = {
   clickTips: '请点击目标节点',
   summary: '摘要',
   openFile: '打开文件',
+  invalidFileType: '请选择 JSON 文件',
+  fileTooLarge: '文件大小必须小于 10MB',
+  invalidJSON: '无效的 JSON 格式',
+  invalidMindMapStructure: '无效的思维导图结构',
+  missingNodeData: '缺少必需的 nodeData 字段',
+  errorReadingFile: '读取文件时出错',
+  fileLoadedSuccessfully: '文件加载成功',
 }
 const i18n: Record<Locale, LangPack> = {
   cn,
@@ -50,6 +64,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: '請點擊目標節點',
     summary: '摘要',
     openFile: '開啟檔案',
+    invalidFileType: '請選擇 JSON 檔案',
+    fileTooLarge: '檔案大小必須小於 10MB',
+    invalidJSON: '無效的 JSON 格式',
+    invalidMindMapStructure: '無效的心智圖結構',
+    missingNodeData: '缺少必需的 nodeData 欄位',
+    errorReadingFile: '讀取檔案時出錯',
+    fileLoadedSuccessfully: '檔案載入成功',
   },
   en: {
     addChild: 'Add child',
@@ -65,6 +86,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'Please click the target node',
     summary: 'Summary',
     openFile: 'Open File',
+    invalidFileType: 'Please select a JSON file',
+    fileTooLarge: 'File size must be less than 10MB',
+    invalidJSON: 'Invalid JSON format',
+    invalidMindMapStructure: 'Invalid mind map structure',
+    missingNodeData: 'Missing required nodeData field',
+    errorReadingFile: 'Error reading file',
+    fileLoadedSuccessfully: 'File loaded successfully',
   },
   ru: {
     addChild: 'Добавить дочерний элемент',
@@ -80,6 +108,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'Пожалуйста, нажмите на целевой узел',
     summary: 'Описание',
     openFile: 'Открыть файл',
+    invalidFileType: 'Пожалуйста, выберите файл JSON',
+    fileTooLarge: 'Размер файла должен быть меньше 10 МБ',
+    invalidJSON: 'Неверный формат JSON',
+    invalidMindMapStructure: 'Неверная структура карты разума',
+    missingNodeData: 'Отсутствует обязательное поле nodeData',
+    errorReadingFile: 'Ошибка чтения файла',
+    fileLoadedSuccessfully: 'Файл успешно загружен',
   },
   ja: {
     addChild: '子ノードを追加する',
@@ -95,6 +130,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'ターゲットノードをクリックしてください',
     summary: '概要',
     openFile: 'ファイルを開く',
+    invalidFileType: 'JSONファイルを選択してください',
+    fileTooLarge: 'ファイルサイズは10MB未満である必要があります',
+    invalidJSON: '無効なJSON形式',
+    invalidMindMapStructure: '無効なマインドマップ構造',
+    missingNodeData: '必須のnodeDataフィールドがありません',
+    errorReadingFile: 'ファイルの読み取りエラー',
+    fileLoadedSuccessfully: 'ファイルが正常に読み込まれました',
   },
   pt: {
     addChild: 'Adicionar item filho',
@@ -110,6 +152,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'Favor clicar no item alvo',
     summary: 'Resumo',
     openFile: 'Abrir Arquivo',
+    invalidFileType: 'Por favor, selecione um arquivo JSON',
+    fileTooLarge: 'O tamanho do arquivo deve ser menor que 10MB',
+    invalidJSON: 'Formato JSON inválido',
+    invalidMindMapStructure: 'Estrutura de mapa mental inválida',
+    missingNodeData: 'Campo nodeData obrigatório ausente',
+    errorReadingFile: 'Erro ao ler arquivo',
+    fileLoadedSuccessfully: 'Arquivo carregado com sucesso',
   },
   it: {
     addChild: 'Aggiungi figlio',
@@ -125,6 +174,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'Si prega di fare clic sul nodo di destinazione',
     summary: 'Unisci nodi',
     openFile: 'Apri File',
+    invalidFileType: 'Si prega di selezionare un file JSON',
+    fileTooLarge: 'La dimensione del file deve essere inferiore a 10MB',
+    invalidJSON: 'Formato JSON non valido',
+    invalidMindMapStructure: 'Struttura mappa mentale non valida',
+    missingNodeData: 'Campo nodeData richiesto mancante',
+    errorReadingFile: 'Errore nella lettura del file',
+    fileLoadedSuccessfully: 'File caricato con successo',
   },
   es: {
     addChild: 'Agregar hijo',
@@ -140,6 +196,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'Por favor haga clic en el nodo de destino',
     summary: 'Resumen',
     openFile: 'Abrir Archivo',
+    invalidFileType: 'Por favor seleccione un archivo JSON',
+    fileTooLarge: 'El tamaño del archivo debe ser menor a 10MB',
+    invalidJSON: 'Formato JSON inválido',
+    invalidMindMapStructure: 'Estructura de mapa mental inválida',
+    missingNodeData: 'Falta el campo nodeData requerido',
+    errorReadingFile: 'Error al leer el archivo',
+    fileLoadedSuccessfully: 'Archivo cargado exitosamente',
   },
   fr: {
     addChild: 'Ajout enfant',
@@ -155,6 +218,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: 'Cliquer sur le noeud cible',
     summary: 'Annoter',
     openFile: 'Ouvrir Fichier',
+    invalidFileType: 'Veuillez sélectionner un fichier JSON',
+    fileTooLarge: 'La taille du fichier doit être inférieure à 10 Mo',
+    invalidJSON: 'Format JSON invalide',
+    invalidMindMapStructure: 'Structure de carte mentale invalide',
+    missingNodeData: 'Champ nodeData requis manquant',
+    errorReadingFile: 'Erreur lors de la lecture du fichier',
+    fileLoadedSuccessfully: 'Fichier chargé avec succès',
   },
   ko: {
     addChild: '자식 추가',
@@ -170,6 +240,13 @@ const i18n: Record<Locale, LangPack> = {
     clickTips: '대상 노드를 클릭하십시오',
     summary: '요약',
     openFile: '파일 열기',
+    invalidFileType: 'JSON 파일을 선택하세요',
+    fileTooLarge: '파일 크기는 10MB 미만이어야 합니다',
+    invalidJSON: '잘못된 JSON 형식',
+    invalidMindMapStructure: '잘못된 마인드맵 구조',
+    missingNodeData: '필수 nodeData 필드가 누락되었습니다',
+    errorReadingFile: '파일 읽기 오류',
+    fileLoadedSuccessfully: '파일이 성공적으로 로드되었습니다',
   },
 }
 

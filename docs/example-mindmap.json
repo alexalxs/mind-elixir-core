@@ -1,0 +1,203 @@
+{
+  "nodeData": {
+    "id": "root",
+    "topic": "Mind Elixir Core",
+    "root": true,
+    "children": [
+      {
+        "id": "node1",
+        "topic": "Features",
+        "style": {
+          "color": "#fff",
+          "background": "#4285F4",
+          "fontSize": "16px",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "node1-1",
+            "topic": "Drag & Drop",
+            "style": {
+              "color": "#333",
+              "background": "#E8F0FE"
+            }
+          },
+          {
+            "id": "node1-2",
+            "topic": "Keyboard Shortcuts",
+            "style": {
+              "color": "#333",
+              "background": "#E8F0FE"
+            }
+          },
+          {
+            "id": "node1-3",
+            "topic": "Custom Styling",
+            "style": {
+              "color": "#333",
+              "background": "#E8F0FE",
+              "border": "2px dashed #4285F4"
+            }
+          }
+        ]
+      },
+      {
+        "id": "node2",
+        "topic": "Documentation",
+        "style": {
+          "color": "#fff",
+          "background": "#34A853",
+          "fontSize": "16px",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "node2-1",
+            "topic": "API Reference",
+            "style": {
+              "color": "#333",
+              "background": "#E6F4EA"
+            }
+          },
+          {
+            "id": "node2-2",
+            "topic": "Examples",
+            "expanded": false,
+            "style": {
+              "color": "#333",
+              "background": "#E6F4EA"
+            },
+            "children": [
+              {
+                "id": "node2-2-1",
+                "topic": "Basic Usage",
+                "tags": ["tutorial"]
+              },
+              {
+                "id": "node2-2-2",
+                "topic": "Advanced Features",
+                "tags": ["advanced"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "node3",
+        "topic": "Plugins",
+        "style": {
+          "color": "#fff",
+          "background": "#FBBC04",
+          "fontSize": "16px",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "node3-1",
+            "topic": "Node Menu",
+            "image": {
+              "url": "https://via.placeholder.com/100x100/FBBC04/FFFFFF?text=Menu",
+              "width": 100,
+              "height": 100
+            }
+          },
+          {
+            "id": "node3-2",
+            "topic": "Toolbar",
+            "hyperLink": "https://github.com/ssshooter/mind-elixir-core"
+          },
+          {
+            "id": "node3-3",
+            "topic": "Export Options",
+            "children": [
+              {
+                "id": "node3-3-1",
+                "topic": "PNG Export"
+              },
+              {
+                "id": "node3-3-2",
+                "topic": "SVG Export"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "node4",
+        "topic": "Community",
+        "style": {
+          "color": "#fff",
+          "background": "#EA4335",
+          "fontSize": "16px",
+          "fontWeight": "bold"
+        },
+        "children": [
+          {
+            "id": "node4-1",
+            "topic": "GitHub",
+            "hyperLink": "https://github.com/ssshooter/mind-elixir-core",
+            "style": {
+              "color": "#333",
+              "background": "#FCEBEA"
+            }
+          },
+          {
+            "id": "node4-2",
+            "topic": "Issues & Support",
+            "style": {
+              "color": "#333",
+              "background": "#FCEBEA",
+              "fontStyle": "italic"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "arrows": [
+    {
+      "id": "arrow1",
+      "from": "node1-1",
+      "to": "node3-2",
+      "text": "Integrates with",
+      "color": "#4285F4"
+    },
+    {
+      "id": "arrow2",
+      "from": "node2-1",
+      "to": "node4-1",
+      "text": "Documentation",
+      "color": "#34A853"
+    }
+  ],
+  "summaries": [
+    {
+      "id": "summary1",
+      "from": "node1-1",
+      "to": "node1-3",
+      "text": "Core UI Features"
+    },
+    {
+      "id": "summary2",
+      "from": "node3-1",
+      "to": "node3-3",
+      "text": "Extension System"
+    }
+  ],
+  "direction": 1,
+  "theme": {
+    "name": "Fresh Blue",
+    "palette": [
+      "#4285F4",
+      "#34A853", 
+      "#FBBC04",
+      "#EA4335"
+    ],
+    "cssVar": {
+      "--main-color": "#4285F4",
+      "--main-bgcolor": "#f6f6f6",
+      "--color": "#333",
+      "--bgcolor": "#fff"
+    }
+  }
+}

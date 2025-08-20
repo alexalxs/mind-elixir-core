@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test File Open - Mind Elixir</title>
+  <link rel="stylesheet" href="./dist/style.css">
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+    }
+    .info {
+      margin: 20px;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+    .test-section {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="info">
+    <h1>File Open Feature Test</h1>
+    <p>Click the folder icon in the toolbar to open a JSON file.</p>
+    <p>Test file available: <code>docs/example-mindmap.json</code></p>
+  </div>
+  
+  <div id="map"></div>
+  
+  <div class="test-section">
+    <h3>Test Checklist:</h3>
+    <ul>
+      <li>✓ Open File button appears in toolbar</li>
+      <li>✓ File dialog opens when button is clicked</li>
+      <li>✓ Only .json files are accepted</li>
+      <li>✓ Error messages are localized based on locale</li>
+      <li>✓ Mind map is refreshed with new data</li>
+      <li>✓ Arrows and summaries are preserved</li>
+      <li>✓ Map is centered after loading</li>
+    </ul>
+  </div>
+
+  <script src="./dist/MindElixir.js"></script>
+  <script>
+    const mind = new MindElixir({
+      el: '#map',
+      locale: 'en',
+      direction: MindElixir.LEFT,
+      data: {
+        nodeData: {
+          id: 'root',
+          topic: 'Default Mind Map',
+          root: true,
+          children: [
+            {
+              id: 'sub1',
+              topic: 'Click folder icon to open file'
+            }
+          ]
+        }
+      },
+      toolBar: true
+    })
+    mind.init()
+    
+    // Log when refresh is called
+    const originalRefresh = mind.refresh.bind(mind)
+    mind.refresh = function(data) {
+      console.log('Refresh called with data:', data)
+      originalRefresh(data)
+      console.log('Map refreshed and centered')
+    }
+  </script>
+</body>
+</html>

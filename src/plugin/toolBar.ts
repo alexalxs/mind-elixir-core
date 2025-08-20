@@ -7,6 +7,7 @@ import living from '../icons/living.svg?raw'
 import zoomin from '../icons/zoomin.svg?raw'
 import zoomout from '../icons/zoomout.svg?raw'
 import folderopen from '../icons/folder-open.svg?raw'
+import i18n from '../i18n'
 
 import './toolBar.less'
 
@@ -25,6 +26,60 @@ const createButton = (id: string, name: string) => {
   button.id = id
   button.innerHTML = map[name]
   return button
+}
+
+// Validate MindElixir data structure
+const validateMindElixirData = (data: any): { valid: boolean; error?: string } => {
+  // Check if data is an object
+  if (typeof data !== 'object' || data === null) {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  // Check required nodeData field
+  if (!data.nodeData) {
+    return { valid: false, error: 'missingNodeData' }
+  }
+  
+  // Validate nodeData structure
+  const nodeData = data.nodeData
+  if (typeof nodeData !== 'object' || nodeData === null) {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  // Check required fields in nodeData
+  if (!nodeData.id || typeof nodeData.id !== 'string') {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  if (!nodeData.topic || typeof nodeData.topic !== 'string') {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  if (typeof nodeData.root !== 'boolean') {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  // Validate children if present
+  if (nodeData.children && !Array.isArray(nodeData.children)) {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  // Validate arrows if present
+  if (data.arrows && !Array.isArray(data.arrows)) {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  // Validate summaries if present
+  if (data.summaries && !Array.isArray(data.summaries)) {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  // Validate direction if present
+  if (data.direction !== undefined && ![0, 1, 2].includes(data.direction)) {
+    return { valid: false, error: 'invalidMindMapStructure' }
+  }
+  
+  return { valid: true }
 }
 
 function createToolBarRBContainer(mind: MindElixirInstance) {
@@ -92,16 +147,20 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
       
       if (!file) return
       
+      // Get current locale
+      const locale = mind.locale || 'en'
+      const lang = i18n[locale] || i18n.en
+      
       // Validate file type
       if (!file.name.toLowerCase().endsWith('.json')) {
-        alert('Please select a JSON file')
+        alert(lang.invalidFileType)
         return
       }
       
       // Validate file size (max 10MB)
       const maxSize = 10 * 1024 * 1024 // 10MB
       if (file.size > maxSize) {
-        alert('File size must be less than 10MB')
+        alert(lang.fileTooLarge)
         return
       }
       
@@ -114,23 +173,30 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
         try {
           const data = JSON.parse(content)
           
-          // Basic validation - check if it has nodeData
-          if (!data.nodeData) {
-            alert('Invalid mind map structure: missing nodeData')
+          // Validate data structure
+          const validation = validateMindElixirData(data)
+          if (!validation.valid) {
+            alert(lang[validation.error! as keyof typeof lang] || lang.invalidMindMapStructure)
             return
           }
           
-          // For now, just log the data (Phase 4 will integrate with refresh)
-          console.log('Valid mind map data loaded:', data)
-          alert('File loaded successfully! (Integration pending)')
+          // Integrate with refresh to load the new mind map
+          try {
+            mind.refresh(data)
+            console.log('Mind map loaded successfully:', data)
+            // No need for alert as the map will be visually updated
+          } catch (refreshError) {
+            console.error('Error refreshing mind map:', refreshError)
+            alert(lang.errorReadingFile + ': ' + (refreshError as Error).message)
+          }
           
         } catch (error) {
-          alert('Invalid JSON format: ' + (error as Error).message)
+          alert(lang.invalidJSON + ': ' + (error as Error).message)
         }
       }
       
       reader.onerror = () => {
-        alert('Error reading file')
+        alert(lang.errorReadingFile)
       }
       
       reader.readAsText(file, 'UTF-8')
