@@ -59,6 +59,11 @@ interface MindMapNode {
 
 #### Resposta da API
 
+**IMPORTANTE: A Edge Function é responsável por:**
+1. **Validar e garantir o formato correto da resposta da OpenAI**
+2. **Converter a resposta da IA para o formato JSON aceito pelo Mind Elixir**
+
+
 A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de nós do Mind Elixir:
 
 **Para todos os modos (expand, question e custom):**
@@ -77,20 +82,31 @@ A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de n
 }
 ```
 
-**Estrutura de nó obrigatória:**
-- `topic`: string - O texto do nó
-- `id`: string - Identificador único
-- `aiGenerated`: boolean - Sempre true para nós gerados por IA
+**Estrutura de nó obrigatória (validada pela Edge Function):**
+- `topic`: string - O texto do nó (obrigatório)
+- `id`: string - Identificador único (gerado automaticamente se ausente)
+- `aiGenerated`: boolean - Sempre true (adicionado automaticamente)
 
-**Campos opcionais:**
-- `children`: array - Subnós (usado em modo question)
-- `style`: object - Estilos CSS customizados
-- `tags`: array - Tags do nó
+**Campos opcionais (validados pela Edge Function):**
+- `children`: array - Subnós (validados recursivamente)
+- `style`: object - Estilos CSS (removido se inválido)
+- `tags`: array - Tags do nó (removido se inválido)
 - `image`: object - Imagem anexada
 - `hyperLink`: string - Link externo
 
-**Importante**: A API retorna apenas o conteúdo gerado pela IA. O cliente (plugin frontend) é responsável por:
-- Gerar IDs únicos para cada nó
+**Processo de Validação da Edge Function:**
+1. Recebe resposta da OpenAI (que pode estar em qualquer formato)
+2. Tenta fazer parse do JSON e extrair estrutura `{ children: [...] }`
+3. Valida cada nó recursivamente:
+   - Garante que `topic` existe e é string
+   - Gera `id` único se não existir
+   - Adiciona `aiGenerated: true`
+   - Valida e processa `children` recursivamente
+   - Remove campos opcionais inválidos
+4. Se o parse falhar, aplica fallback extraindo linhas de texto
+5. Sempre retorna JSON válido no formato esperado
+
+**O cliente (plugin frontend) é responsável por:**
 - Aplicar formatação e estilos herdados
 - Adicionar metadados (aiGeneratedAt)
 - Criar estrutura hierárquica no mapa mental
@@ -106,7 +122,6 @@ A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de n
 
 **O que o usuário precisa fazer:**
 - Escrever APENAS as instruções específicas do que deseja
-- Incluir formato de resposta desejado (se quiser JSON estruturado)
 - Não precisa mencionar "mapa mental" ou "nó selecionado" - isso já está no contexto
 
 #### Prompts Utilizados pela Edge Function
@@ -114,10 +129,8 @@ A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de n
 **IMPORTANTE**: A Edge Function funciona como um **intermediário 100% transparente** entre o cliente e a OpenAI:
 - O cliente tem controle TOTAL sobre TUDO: prompt, modelo, temperatura, tokens, etc.
 - A função APENAS repassa as configurações recebidas para a OpenAI
-- Não há modos pré-definidos (expand, question) - apenas prompt livre
 - O campo `prompt` é OBRIGATÓRIO e define completamente o comportamento
 - O cliente é responsável por incluir TODAS as instruções necessárias
-- Isso inclui formato JSON, estrutura de resposta, detalhamento, etc.
 - A função é completamente stateless e não adiciona nenhum conteúdo
 
 **Exemplos de Prompts:**
@@ -126,74 +139,6 @@ A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de n
 - O mapa mental completo em formato JSON ao contexto
 - Informação sobre qual nó está selecionado
 - Os exemplos abaixo mostram apenas o que o USUÁRIO precisa escrever
-
-**Exemplo 1 - Expandir Tópicos:**
-```
-Expanda o tópico selecionado em 5 subtópicos relevantes.
-
-CADA SUBTÓPICO DEVE:
-- Ter entre 8-12 palavras
-- Ser uma frase descritiva completa
-- Explicar um conceito ou funcionalidade específica
-
-RETORNE em formato JSON:
-{
-  "children": [
-    {
-      "topic": "Virtual DOM para otimização de renderização de componentes",
-      "id": "react-1",
-      "aiGenerated": true
-    }
-  ]
-}
-```
-
-**Exemplo 2 - Gerar Perguntas e Respostas:**
-```
-Gere 3 perguntas importantes sobre o tópico selecionado com respostas detalhadas.
-
-CADA RESPOSTA deve ter 50-80 palavras.
-
-RETORNE em formato JSON:
-{
-  "children": [
-    {
-      "topic": "O que é o Event Loop no Node.js?",
-      "id": "q1",
-      "aiGenerated": true,
-      "children": [
-        {
-          "topic": "O Event Loop é o mecanismo que permite ao Node.js executar operações não-bloqueantes...",
-          "id": "a1",
-          "aiGenerated": true
-        }
-      ]
-    }
-  ]
-}
-```
-
-**Exemplo 3 - Análise Customizada:**
-```
-Analise o contexto do mapa mental e identifique lacunas de conhecimento no tópico selecionado.
-
-Liste 4 áreas que poderiam ser adicionadas para tornar o mapa mais completo.
-
-Para cada área, forneça:
-1. Nome da área (5-8 palavras)
-2. Justificativa de por que é importante (15-20 palavras)
-
-RETORNE em formato JSON:
-{
-  "children": [
-    {
-      "topic": "Testes Automatizados com Jest e Testing Library - Justificativa: Garantir qualidade e confiabilidade do código frontend através de testes unitários e de integração",
-      "id": "gap-1",
-      "aiGenerated": true
-    }
-  ]
-}
-```
 
 #### Configuração da OpenAI
 
@@ -210,31 +155,48 @@ As configurações da OpenAI agora são **dinâmicas e configuráveis** via payl
   - Padrão: `2000`
   - Recomendado: 1000-4000 para respostas detalhadas
 
-**Exemplo de requisição completa:**
+#### Tratamento de Erros
+
+**Validações da Edge Function:**
+1. **Validação de Payload (entrada):**
+   - Limite de payload: 1MB
+   - Valida estrutura JSON do payload recebido
+   - Verifica campos obrigatórios: `mindMap`, `selectedNodeId`, `prompt`
+   - Valida estrutura do `nodeData` recursivamente
+   - Retorna erro 400 com detalhes específicos se inválido
+
+2. **Validação de Resposta da OpenAI:**
+   - Valida se a resposta é JSON válido
+   - Verifica estrutura `{ children: [...] }`
+   - Valida cada nó recursivamente:
+     - Campo `topic` obrigatório e string
+     - Campo `id` gerado automaticamente se ausente
+     - Campo `aiGenerated` adicionado como true
+     - Campos opcionais removidos se inválidos
+   - Aplica fallback se JSON inválido (extrai linhas de texto)
+
+3. **Outros Erros:**
+   - Retorna erro 400 se o nó selecionado não for encontrado
+   - Retorna erro se OPENAI_API_KEY não estiver configurada
+   - Erros da API OpenAI são capturados e retornados
+
+**Estrutura de Erro Padronizada:**
 ```json
 {
-  "mindMap": { 
-    "nodeData": {
-      "id": "root",
-      "topic": "Desenvolvimento Web",
-      "children": [...]
-    }
-  },
-  "selectedNodeId": "react",
-  "prompt": "Expanda o tópico 'React' em 5 subtópicos...[prompt completo aqui]",
-  "openAIConfig": {
-    "model": "gpt-4-turbo-preview",
-    "temperature": 0.8,
-    "maxTokens": 3000
-  }
+  "error": "Mensagem do erro",
+  "type": "TIPO_DO_ERRO",
+  "details": "Detalhes adicionais",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "validationErrors": ["Lista de erros de validação se aplicável"]
 }
 ```
 
-#### Tratamento de Erros
-- Limite de payload: 1MB
-- Retorna erro 400 se o nó selecionado não for encontrado
-- Retorna erro se OPENAI_API_KEY não estiver configurada
-- Valida se o json recebido da open ai cumpre os requisitos de formato
+**Tipos de Erro:**
+- `JSON_ERROR`: Problema com formato JSON
+- `STRUCTURE_ERROR`: Estrutura do payload incorreta
+- `OPENAI_ERROR`: Erro na comunicação com OpenAI
+- `NODE_NOT_FOUND`: Nó selecionado não existe
+- `UNKNOWN_ERROR`: Outros erros
 
 ## Fase 2: Estrutura do Plugin ✅ COMPLETA
 [x] Criar arquivo src/plugin/aiAssistant.ts
@@ -280,7 +242,8 @@ As configurações da OpenAI agora são **dinâmicas e configuráveis** via payl
 [x] Script de otimização criado em tests/optimize-ai-prompts.ts para testar variações de prompts
 [x] Campo de prompt customizado na interface para todos os modos
 [x] O campo prompt deve ser levado em consideração nas requisições,  pois ao pedir para expandir ignora o prompt customizado e sempre gera 5 filhos.
-[Fix] O componente de Ai Assistent deve ser modificado para se tornar uma aba junto com o componente de edição de nós e textos e ambos devem ficar ativados desde o carregamento da aplicação. Adicionar também as opções para formatar a requisição como modelo open ai e outros aspectos diferentes do prompt
+[x] O componente de Ai Assistent deve ser modificado para se tornar uma aba junto com o componente de edição de nós e textos e ambos devem ficar ativados desde o carregamento da aplicação. Contudo as abas de edição de no e aba de edição de conteúdo não estao carregando corretamente. 
+[x]Adicionar também as opções para formatar a requisição como modelo open ai e outros aspectos diferentes do prompt. 
 [x] O modelo da open ai, max_tokens, temperature, instruções sobre o detalhamento , número de palavras, é passado na requisição
 
 
@@ -296,5 +259,4 @@ As configurações da OpenAI agora são **dinâmicas e configuráveis** via payl
 [ ] Adicionar tratamento para quando API key não está configurada
 [ ] Implementar feedback para rate limits da API
 [ ] Adicionar opção para remover/editar nós gerados por IA
-
-
+[ ] Se o payload for superior ao limite então implementar alguma técnicas para reduzir o tamanho do contexto
