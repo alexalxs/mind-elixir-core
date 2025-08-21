@@ -119,19 +119,51 @@ A API SEMPRE retorna conteúdo no formato JSON válido seguindo a estrutura de n
 2. Identifica qual nó está selecionado pelo usuário
 3. Adiciona essas informações ao contexto antes de enviar para a IA
 4. Envia tudo junto com o prompt do usuário para a Edge Function
+5. **Instrui a OpenAI sobre o formato JSON exato do Mind Elixir** através do prompt system
 
 **O que o usuário precisa fazer:**
 - Escrever APENAS as instruções específicas do que deseja
 - Não precisa mencionar "mapa mental" ou "nó selecionado" - isso já está no contexto
+- Não precisa especificar formato JSON - isso é feito automaticamente
 
 #### Prompts Utilizados pela Edge Function
 
-**IMPORTANTE**: A Edge Function funciona como um **intermediário 100% transparente** entre o cliente e a OpenAI:
-- O cliente tem controle TOTAL sobre TUDO: prompt, modelo, temperatura, tokens, etc.
-- A função APENAS repassa as configurações recebidas para a OpenAI
-- O campo `prompt` é OBRIGATÓRIO e define completamente o comportamento
-- O cliente é responsável por incluir TODAS as instruções necessárias
-- A função é completamente stateless e não adiciona nenhum conteúdo
+**IMPORTANTE**: A Edge Function atua como intermediário entre o cliente e a OpenAI:
+- O cliente tem controle sobre: prompt do usuário, modelo, temperatura, tokens
+- A Edge Function adiciona automaticamente:
+  - **Prompt system com instruções detalhadas do formato JSON do Mind Elixir**
+  - Contexto do mapa mental completo
+  - Informação sobre o nó selecionado
+- O campo `prompt` do usuário é OBRIGATÓRIO e define o comportamento específico
+
+**Prompt System Automático (adicionado pela Edge Function):**
+```
+Você é um assistente especializado em criar mapas mentais DETALHADOS e INFORMATIVOS usando o formato Mind Elixir.
+
+FORMATO DE RESPOSTA OBRIGATÓRIO:
+{
+  "children": [
+    {
+      "topic": "Texto do nó (OBRIGATÓRIO - deve ser uma string)",
+      "id": "identificador-unico",
+      "aiGenerated": true,
+      "children": []
+    }
+  ]
+}
+
+REGRAS DO FORMATO MIND ELIXIR:
+1. O objeto raiz DEVE ter apenas um campo "children" que é um array
+2. Cada nó DEVE ter obrigatoriamente:
+   - "topic": string com o texto do nó (NUNCA pode ser null ou vazio)
+   - "id": string com identificador único
+   - "aiGenerated": boolean sempre true
+3. Campos opcionais:
+   - "children": array de sub-nós (seguindo mesma estrutura)
+   - "style": objeto com estilos CSS
+   - "tags": array de strings
+   - "hyperLink": string com URL
+```
 
 **Exemplos de Prompts:**
 
@@ -243,6 +275,7 @@ As configurações da OpenAI agora são **dinâmicas e configuráveis** via payl
 [x] Campo de prompt customizado na interface para todos os modos
 [x] O campo prompt deve ser levado em consideração nas requisições,  pois ao pedir para expandir ignora o prompt customizado e sempre gera 5 filhos.
 [x] O componente de Ai Assistent deve ser modificado para se tornar uma aba junto com o componente de edição de nós e textos e ambos devem ficar ativados desde o carregamento da aplicação. Contudo as abas de edição de no e aba de edição de conteúdo não estao carregando corretamente. 
+[Fix] A cada incremento ou decremento variar em mil unidades de token
 [x]Adicionar também as opções para formatar a requisição como modelo open ai e outros aspectos diferentes do prompt. 
 [x] O modelo da open ai, max_tokens, temperature, instruções sobre o detalhamento , número de palavras, é passado na requisição
 

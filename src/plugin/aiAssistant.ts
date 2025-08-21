@@ -1,6 +1,6 @@
 import type { MindElixirInstance, NodeObj } from '../types/index'
 import type { Topic } from '../types/dom'
-import type { AINodeObj, AIMode, AIAssistantPayload } from './aiAssistant.types'
+import type { AINodeObj, AIAssistantPayload } from './aiAssistant.types'
 import './aiAssistant.less'
 
 export interface AIAssistantOptions {
@@ -9,13 +9,28 @@ export interface AIAssistantOptions {
   enabled?: boolean
   autoSuggest?: boolean
   maxSuggestions?: number
+  // Panel position configuration
+  position?: {
+    top?: string
+    right?: string
+    bottom?: string
+    left?: string
+  }
+  // OpenAI default configurations
+  defaultOpenAIConfig?: {
+    model?: string
+    temperature?: number
+    maxTokens?: number
+  }
+  // Detail default configurations
+  defaultDetailConfig?: {
+    minWordsPerTopic?: number
+    maxWordsPerTopic?: number
+    minWordsPerAnswer?: number
+    maxWordsPerAnswer?: number
+  }
 }
 
-const AI_MODES: AIMode[] = [
-  { id: 'expand', label: 'Expandir', icon: '🌱', description: 'Expandir com subtópicos' },
-  { id: 'question', label: 'Perguntas', icon: '❓', description: 'Gerar perguntas exploratórias' },
-  { id: 'custom', label: 'Personalizado', icon: '✨', description: 'Prompt personalizado' }
-]
 
 export default function aiAssistant(mind: MindElixirInstance, options: AIAssistantOptions = {}) {
   const {
@@ -23,42 +38,88 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10dWd6b2dha2hxcXB5a29wc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY5MzIsImV4cCI6MjA3MTIzMjkzMn0.0SypN0pLQ0TgZsWYjplh8Dp3PiXcD7tOxhPSBf9tK4U',
     enabled = true,
     autoSuggest = false,
-    maxSuggestions = 5
+    maxSuggestions = 5,
+    position = { top: '20px', right: '20px' }
   } = options
 
   if (!enabled) return
 
   let currentNode: NodeObj | null = null
   let isLoading = false
+  let editorPanel: HTMLElement
 
-  // Create AI Assistant Panel
-  const aiPanel = document.createElement('div')
-  aiPanel.className = 'ai-assistant-panel'
-  aiPanel.innerHTML = `
-    <div class="ai-assistant-header">
-      <span class="ai-assistant-title">🤖 Assistente IA</span>
-      <button class="ai-assistant-close">✕</button>
+  // Check if style editor already exists
+  const existingStyleEditor = mind.container.querySelector('.style-editor') as HTMLElement
+  
+  if (existingStyleEditor) {
+    // Hide the existing style editor first
+    existingStyleEditor.style.display = 'none'
+    
+    // Create a new integrated panel
+    editorPanel = document.createElement('div')
+    editorPanel.className = 'integrated-editor-panel'
+    
+    // Get the content from style editor
+    const styleEditorContent = existingStyleEditor.querySelector('.style-editor-content')?.innerHTML || ''
+    
+    editorPanel.innerHTML = `
+    <div class="editor-header">
+      <div class="editor-tabs">
+        <button class="tab-btn active" data-tab="style">Estilo</button>
+        <button class="tab-btn" data-tab="ai">IA Assistant</button>
+      </div>
+      <button class="close-btn">✕</button>
     </div>
-    <div class="ai-assistant-content">
+    <div class="editor-content">
+      <div class="tab-content active" data-content="style">
+        <div class="style-editor-content">
+          ${styleEditorContent}
+        </div>
+      </div>
+      <div class="tab-content" data-content="ai">
+        <div class="ai-assistant-content">
       <div class="ai-current-node">
         <label>Nó selecionado:</label>
         <span class="ai-node-topic">Nenhum</span>
       </div>
-      <div class="ai-modes">
-        ${AI_MODES.map(mode => `
-          <button class="ai-mode-btn" data-mode="${mode.id}" title="${mode.description}">
-            <span class="ai-mode-icon">${mode.icon}</span>
-            <span class="ai-mode-label">${mode.label}</span>
-          </button>
-        `).join('')}
+      <div class="ai-prompt-section">
+        <label>Prompt:</label>
+        <textarea class="ai-prompt-input" placeholder="Expanda o tópico selecionado em 5 subtópicos relevantes..." rows="4"></textarea>
       </div>
-      <div class="ai-custom-prompt" style="display: none;">
-        <textarea placeholder="Digite seu prompt personalizado..." rows="3"></textarea>
+      
+      <div class="ai-config-section">
+        <div class="config-header">
+          <label>Configurações OpenAI</label>
+          <button class="toggle-config-btn">▼</button>
+        </div>
+        <div class="config-content" style="display: none;">
+          <div class="config-group">
+            <label>Modelo:</label>
+            <select class="ai-model-select">
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Rápido)</option>
+              <option value="gpt-4">GPT-4 (Preciso)</option>
+              <option value="gpt-4-turbo-preview">GPT-4 Turbo (Melhor)</option>
+            </select>
+          </div>
+          <div class="config-group">
+            <label>Temperatura (0-2):</label>
+            <div class="slider-container">
+              <input type="range" class="ai-temperature-slider" min="0" max="2" step="0.1" value="0.7">
+              <span class="slider-value">0.7</span>
+            </div>
+            <small>Menor = mais focado, Maior = mais criativo</small>
+          </div>
+          <div class="config-group">
+            <label>Máx. Tokens:</label>
+            <input type="number" class="ai-max-tokens" min="100" max="4000" value="2000">
+            <small>Limite de tamanho da resposta</small>
+          </div>
+        </div>
       </div>
+      
       <div class="ai-suggestions">
         <div class="ai-suggestions-header">
-          <label>Sugestões:</label>
-          <button class="ai-generate-btn" disabled>Gerar</button>
+          <button class="ai-generate-btn" disabled>Gerar Sugestões</button>
         </div>
         <div class="ai-suggestions-list"></div>
       </div>
@@ -66,46 +127,151 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
         <div class="ai-spinner"></div>
         <span>Gerando sugestões...</span>
       </div>
+        </div>
+      </div>
     </div>
+  </div>
   `
-
-  mind.container.appendChild(aiPanel)
+    
+    // Replace the old style editor with the integrated panel
+    existingStyleEditor.parentNode?.replaceChild(editorPanel, existingStyleEditor)
+  } else {
+    // No existing style editor, create a new integrated panel
+    editorPanel = document.createElement('div')
+    editorPanel.className = 'integrated-editor-panel'
+    editorPanel.innerHTML = `
+    <div class="editor-header">
+      <div class="editor-tabs">
+        <button class="tab-btn" data-tab="style">Estilo</button>
+        <button class="tab-btn active" data-tab="ai">IA Assistant</button>
+      </div>
+      <button class="close-btn">✕</button>
+    </div>
+    <div class="editor-content">
+      <div class="tab-content" data-content="style">
+        <div class="style-editor-message">
+          <p>Editor de estilo não está carregado</p>
+        </div>
+      </div>
+      <div class="tab-content active" data-content="ai">
+        <div class="ai-assistant-content">
+      <div class="ai-current-node">
+        <label>Nó selecionado:</label>
+        <span class="ai-node-topic">Nenhum</span>
+      </div>
+      <div class="ai-prompt-section">
+        <label>Prompt:</label>
+        <textarea class="ai-prompt-input" placeholder="Expanda o tópico selecionado em 5 subtópicos relevantes..." rows="4"></textarea>
+      </div>
+      
+      <div class="ai-config-section">
+        <div class="config-header">
+          <label>Configurações OpenAI</label>
+          <button class="toggle-config-btn">▼</button>
+        </div>
+        <div class="config-content" style="display: none;">
+          <div class="config-group">
+            <label>Modelo:</label>
+            <select class="ai-model-select">
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Rápido)</option>
+              <option value="gpt-4">GPT-4 (Preciso)</option>
+              <option value="gpt-4-turbo-preview">GPT-4 Turbo (Melhor)</option>
+            </select>
+          </div>
+          <div class="config-group">
+            <label>Temperatura (0-2):</label>
+            <div class="slider-container">
+              <input type="range" class="ai-temperature-slider" min="0" max="2" step="0.1" value="0.7">
+              <span class="slider-value">0.7</span>
+            </div>
+            <small>Menor = mais focado, Maior = mais criativo</small>
+          </div>
+          <div class="config-group">
+            <label>Máx. Tokens:</label>
+            <input type="number" class="ai-max-tokens" min="100" max="4000" value="2000">
+            <small>Limite de tamanho da resposta</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ai-suggestions">
+        <div class="ai-suggestions-header">
+          <button class="ai-generate-btn" disabled>Gerar Sugestões</button>
+        </div>
+        <div class="ai-suggestions-list"></div>
+      </div>
+      <div class="ai-loading" style="display: none;">
+        <div class="ai-spinner"></div>
+        <span>Gerando sugestões...</span>
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `
+    mind.container.appendChild(editorPanel)
+  }
 
   // Get DOM elements
-  const closeBtn = aiPanel.querySelector('.ai-assistant-close') as HTMLButtonElement
-  const nodeTopic = aiPanel.querySelector('.ai-node-topic') as HTMLSpanElement
-  const modeBtns = aiPanel.querySelectorAll('.ai-mode-btn') as NodeListOf<HTMLButtonElement>
-  const customPromptDiv = aiPanel.querySelector('.ai-custom-prompt') as HTMLDivElement
-  const customPromptTextarea = customPromptDiv.querySelector('textarea') as HTMLTextAreaElement
-  const generateBtn = aiPanel.querySelector('.ai-generate-btn') as HTMLButtonElement
-  const suggestionsList = aiPanel.querySelector('.ai-suggestions-list') as HTMLDivElement
-  const loadingDiv = aiPanel.querySelector('.ai-loading') as HTMLDivElement
+  const closeBtn = editorPanel.querySelector('.close-btn') as HTMLButtonElement
+  const tabBtns = editorPanel.querySelectorAll('.tab-btn') as NodeListOf<HTMLButtonElement>
+  const nodeTopic = editorPanel.querySelector('.ai-node-topic') as HTMLSpanElement
+  const promptTextarea = editorPanel.querySelector('.ai-prompt-input') as HTMLTextAreaElement
+  const generateBtn = editorPanel.querySelector('.ai-generate-btn') as HTMLButtonElement
+  const suggestionsList = editorPanel.querySelector('.ai-suggestions-list') as HTMLDivElement
+  const loadingDiv = editorPanel.querySelector('.ai-loading') as HTMLDivElement
+  
+  // Config elements
+  const toggleConfigBtn = editorPanel.querySelector('.toggle-config-btn') as HTMLButtonElement
+  const configContent = editorPanel.querySelector('.config-content') as HTMLDivElement
+  const modelSelect = editorPanel.querySelector('.ai-model-select') as HTMLSelectElement
+  const temperatureSlider = editorPanel.querySelector('.ai-temperature-slider') as HTMLInputElement
+  const temperatureValue = editorPanel.querySelector('.slider-value') as HTMLSpanElement
+  const maxTokensInput = editorPanel.querySelector('.ai-max-tokens') as HTMLInputElement
 
-  let selectedMode: AIMode['id'] = 'expand'
-
-  // Hide panel initially
-  aiPanel.style.display = 'none'
+  // Position panel according to options and show immediately
+  editorPanel.style.position = 'fixed'
+  if (position.top) editorPanel.style.top = position.top
+  if (position.right) editorPanel.style.right = position.right
+  if (position.bottom) editorPanel.style.bottom = position.bottom
+  if (position.left) editorPanel.style.left = position.left
+  editorPanel.style.display = 'block' // Show on load
+  editorPanel.style.zIndex = '10000' // Ensure it's above other elements
 
   // Event handlers
   closeBtn.addEventListener('click', () => {
-    aiPanel.style.display = 'none'
+    editorPanel.style.display = 'none'
   })
 
-  modeBtns.forEach(btn => {
+  // Tab switching
+  tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      const mode = btn.dataset.mode as AIMode['id']
-      selectedMode = mode
+      const tabName = btn.dataset.tab
+      if (!tabName) return
       
-      // Update active state
-      modeBtns.forEach(b => b.classList.remove('active'))
+      // Update active tab
+      tabBtns.forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
       
-      // Show/hide custom prompt
-      customPromptDiv.style.display = mode === 'custom' ? 'block' : 'none'
-      
-      // Clear suggestions
-      suggestionsList.innerHTML = ''
+      // Show corresponding content
+      const contents = editorPanel.querySelectorAll('.tab-content')
+      contents.forEach(content => {
+        const contentTab = content.getAttribute('data-content')
+        content.classList.toggle('active', contentTab === tabName)
+      })
     })
+  })
+
+  // Config toggle
+  toggleConfigBtn.addEventListener('click', () => {
+    const isVisible = configContent.style.display !== 'none'
+    configContent.style.display = isVisible ? 'none' : 'block'
+    toggleConfigBtn.textContent = isVisible ? '▼' : '▲'
+  })
+
+  // Temperature slider
+  temperatureSlider.addEventListener('input', () => {
+    temperatureValue.textContent = temperatureSlider.value
   })
 
   generateBtn.addEventListener('click', async () => {
@@ -114,39 +280,53 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
   })
 
   // Ensure textarea works properly
-  customPromptTextarea.addEventListener('click', (e) => {
+  promptTextarea.addEventListener('click', (e) => {
     e.stopPropagation()
   })
   
-  customPromptTextarea.addEventListener('keydown', (e) => {
+  promptTextarea.addEventListener('keydown', (e) => {
     e.stopPropagation()
   })
   
-  customPromptTextarea.addEventListener('input', (e) => {
+  promptTextarea.addEventListener('input', (e) => {
     e.stopPropagation()
   })
 
-  // Helper function to remove circular references
-  function cleanNodeData(node: NodeObj): any {
-    const cleaned: any = {
-      id: node.id,
-      topic: node.topic,
-      expanded: node.expanded,
-      direction: node.direction,
-      style: node.style,
-      tags: node.tags,
-      icons: node.icons,
-      hyperLink: node.hyperLink,
-      image: node.image
+  // Helper function to remove circular references and ensure required fields
+  function cleanNodeData(node: NodeObj, depth: number = 0): any {
+    // Ensure node is valid
+    if (!node || typeof node !== 'object') {
+      return null
     }
+    
+    // Force topic to be a string, even if undefined or null
+    const topic = (node.topic !== undefined && node.topic !== null) 
+      ? String(node.topic) 
+      : `Node ${depth}`
+    
+    const cleaned: any = {
+      id: node.id || `node-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+      topic: topic, // Always ensure topic exists as string
+      expanded: node.expanded,
+      direction: node.direction
+    }
+    
+    // Only add optional fields if they exist and are valid
+    if (node.style && typeof node.style === 'object') cleaned.style = node.style
+    if (node.tags && Array.isArray(node.tags)) cleaned.tags = node.tags
+    if (node.icons && Array.isArray(node.icons)) cleaned.icons = node.icons
+    if (node.hyperLink && typeof node.hyperLink === 'string') cleaned.hyperLink = node.hyperLink
+    if (node.image && typeof node.image === 'object') cleaned.image = node.image
     
     // Add root property for the root node
     if (node.id === mind.nodeData.id) {
       cleaned.root = true
     }
     
-    if (node.children && node.children.length > 0) {
-      cleaned.children = node.children.map(child => cleanNodeData(child))
+    if (node.children && Array.isArray(node.children) && node.children.length > 0) {
+      cleaned.children = node.children
+        .map((child, index) => cleanNodeData(child, depth + 1))
+        .filter(child => child !== null) // Remove invalid children
     }
     
     return cleaned
@@ -165,8 +345,23 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     })
 
     if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Erro ao chamar assistente IA')
+      const errorData = await response.json()
+      console.error('[AI Assistant] API Error:', errorData)
+      
+      // Criar mensagem de erro detalhada
+      let errorMessage = errorData.error || 'Erro ao chamar assistente IA'
+      
+      if (errorData.validationErrors && Array.isArray(errorData.validationErrors)) {
+        errorMessage += '\n\nErros de validação:\n' + errorData.validationErrors.join('\n')
+      } else if (errorData.details) {
+        errorMessage += '\n\nDetalhes: ' + errorData.details
+      }
+      
+      if (errorData.type) {
+        errorMessage += '\n\nTipo: ' + errorData.type
+      }
+      
+      throw new Error(errorMessage)
     }
 
     return response.json()
@@ -232,15 +427,25 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
       // Clean the node data to remove circular references
       const cleanedNodeData = cleanNodeData(mind.nodeData)
       
-      const payload: AIAssistantPayload = {
-        mindMap: { nodeData: cleanedNodeData },
-        selectedNodeId: currentNode.id,
-        mode: selectedMode,
-        depth: maxSuggestions
+      // Validate prompt
+      const prompt = promptTextarea.value.trim()
+      if (!prompt) {
+        suggestionsList.innerHTML = '<div class="ai-error">Por favor, digite um prompt</div>'
+        isLoading = false
+        loadingDiv.style.display = 'none'
+        generateBtn.disabled = false
+        return
       }
 
-      if (selectedMode === 'custom' && customPromptTextarea.value) {
-        payload.customPrompt = customPromptTextarea.value
+      const payload = {
+        mindMap: { nodeData: cleanedNodeData },
+        selectedNodeId: currentNode.id,
+        prompt: prompt,
+        openAIConfig: {
+          model: modelSelect.value,
+          temperature: parseFloat(temperatureSlider.value),
+          maxTokens: parseInt(maxTokensInput.value)
+        }
       }
 
       const result = await callAIAssistant(payload)
@@ -253,24 +458,35 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
         // Refresh the mind map view
         mind.refresh()
         
-        // Add visual indicators after refresh
+        // Add visual indicators and ensure expansion after refresh
         setTimeout(() => {
           if (currentNode) {
             addVisualIndicators(currentNode)
+            
+            // Force visual expansion of the node
+            const nodeEl = mind.findEle(currentNode.id)
+            if (nodeEl && currentNode.expanded) {
+              // If node is marked as expanded but children not visible, force expand
+              const wrapper = nodeEl.closest('me-wrapper')
+              const childrenContainer = wrapper?.parentElement?.querySelector('me-nodes')
+              
+              if (!childrenContainer && currentNode.children && currentNode.children.length > 0) {
+                // Children not rendered, force expansion
+                mind.expandNode(nodeEl, true)
+              }
+            }
           }
         }, 100)
         
         // Show success message
         suggestionsList.innerHTML = `
           <div class="ai-success">
-            ✅ ${result.children.length} ${selectedMode === 'question' ? 'perguntas com respostas foram' : 'nós foram'} adicionados com sucesso!
+            ✅ ${result.children.length} sugestões foram adicionadas com sucesso!
           </div>
         `
         
-        // Clear custom prompt after successful generation
-        if (selectedMode === 'custom') {
-          customPromptTextarea.value = ''
-        }
+        // Optionally clear custom prompt after successful generation
+        // customPromptTextarea.value = ''
       } else {
         suggestionsList.innerHTML = '<div class="ai-no-suggestions">Nenhuma sugestão gerada</div>'
       }
@@ -295,7 +511,10 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
         aiOption.className = 'context-menu-item ai-context-option'
         aiOption.innerHTML = '🤖 Assistente IA'
         aiOption.addEventListener('click', () => {
-          aiPanel.style.display = 'block'
+          editorPanel.style.display = 'block'
+          // Switch to AI tab
+          const aiTab = editorPanel.querySelector('[data-tab="ai"]') as HTMLButtonElement
+          aiTab?.click()
           // Use the current selected node
           const selectedNode = mind.currentNode
           if (selectedNode && selectedNode.nodeObj) {
@@ -319,7 +538,7 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
     nodeTopic.textContent = node.topic
     generateBtn.disabled = false
     
-    if (aiPanel.style.display !== 'none' && autoSuggest) {
+    if (editorPanel.style.display !== 'none' && autoSuggest) {
       generateSuggestions()
     }
   })
@@ -331,59 +550,48 @@ export default function aiAssistant(mind: MindElixirInstance, options: AIAssista
       nodeTopic.textContent = currentNode.topic
       generateBtn.disabled = false
       
-      if (aiPanel.style.display !== 'none' && autoSuggest) {
+      if (editorPanel.style.display !== 'none' && autoSuggest) {
         generateSuggestions()
       }
     }
   })
 
-  // Set default mode
-  modeBtns[0].classList.add('active')
+  // No more modes - removed this section
 
   // Listen for toolbar button click
   mind.bus.addListener('openAIAssistant', () => {
-    aiPanel.style.display = 'block'
+    editorPanel.style.display = 'block'
+    // Switch to AI tab
+    const aiTab = editorPanel.querySelector('[data-tab="ai"]') as HTMLButtonElement
+    aiTab?.click()
     
-    // Get the currently selected nodes from mind.currentNodes array
+    // First check if there are selected nodes in currentNodes array
     if (mind.currentNodes && mind.currentNodes.length > 0) {
-      // Get the node object from the selected topic element
+      // Use the last selected node from the array
       const selectedTopicEl = mind.currentNodes[mind.currentNodes.length - 1]
-      const nodeId = selectedTopicEl.dataset.nodeid
-      
-      if (nodeId) {
-        // Find the node object by ID
-        const findNode = (node: NodeObj, id: string): NodeObj | null => {
-          if (node.id === id) return node
-          if (node.children) {
-            for (const child of node.children) {
-              const found = findNode(child, id)
-              if (found) return found
-            }
-          }
-          return null
-        }
-        
-        const selectedNodeObj = findNode(mind.nodeData, nodeId)
-        if (selectedNodeObj) {
-          currentNode = selectedNodeObj
-          nodeTopic.textContent = selectedNodeObj.topic
-          generateBtn.disabled = false
-          return
-        }
+      if (selectedTopicEl && selectedTopicEl.nodeObj) {
+        currentNode = selectedTopicEl.nodeObj
+        nodeTopic.textContent = currentNode.topic
+        generateBtn.disabled = false
       }
-    }
-    
-    // Fallback: if no node is selected, use the root node
-    const rootNode = mind.nodeData
-    if (rootNode) {
-      currentNode = rootNode
-      nodeTopic.textContent = rootNode.topic
+    } else if (mind.currentNode && mind.currentNode.nodeObj) {
+      // Fallback to currentNode if no nodes in array
+      currentNode = mind.currentNode.nodeObj
+      nodeTopic.textContent = currentNode.topic
       generateBtn.disabled = false
+    } else {
+      // Last fallback: if no node is selected, use the root node
+      const rootNode = mind.nodeData
+      if (rootNode) {
+        currentNode = rootNode
+        nodeTopic.textContent = rootNode.topic
+        generateBtn.disabled = false
+      }
     }
   })
 
   // Return cleanup function
   return () => {
-    aiPanel.remove()
+    editorPanel.remove()
   }
 }

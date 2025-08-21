@@ -1,0 +1,365 @@
+// Shared styles for tabs content
+
+// Style Editor Tab
+.style-editor-tab {
+  .style-editor-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .style-tab-btn {
+      background: #f0f0f0;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #e0e0e0;
+      }
+      
+      &.active {
+        background: #007bff;
+        color: white;
+      }
+    }
+  }
+  
+  .style-tab-content {
+    display: none;
+    
+    &.active {
+      display: block;
+    }
+  }
+  
+  .color-section {
+    margin-bottom: 16px;
+    
+    .color-label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .color-palette {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+  }
+  
+  .color-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+      transform: scale(1.1);
+      border-color: #007bff;
+    }
+    
+    &.active {
+      border-color: #007bff;
+    }
+  }
+  
+  .font-family-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .font-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #f0f0f0;
+        border-color: #007bff;
+      }
+    }
+  }
+  
+  .style-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .style-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #f0f0f0;
+      }
+      
+      &.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+      }
+    }
+    
+    .separator {
+      width: 1px;
+      height: 24px;
+      background: #ddd;
+      margin: 0 4px;
+    }
+    
+    .size-up {
+      font-size: 20px;
+    }
+  }
+  
+  .additional-styles {
+    .style-group {
+      margin-bottom: 12px;
+      
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      
+      .style-select {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+// AI Assistant Tab
+.ai-assistant-tab {
+  .ai-current-node {
+    background: #f5f7fa;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    
+    label {
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    
+    .ai-node-topic {
+      color: #007bff;
+      font-weight: 500;
+    }
+  }
+  
+  .ai-prompt-section {
+    margin-bottom: 16px;
+    
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .ai-prompt-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+    }
+  }
+  
+  .ai-config-section {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    
+    .config-header {
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      
+      label {
+        font-weight: 500;
+        margin: 0;
+      }
+      
+      .toggle-config-btn {
+        background: none;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 4px 8px;
+      }
+    }
+    
+    .config-content {
+      padding: 0 12px 12px;
+      
+      .config-group {
+        margin-bottom: 12px;
+        
+        label {
+          display: block;
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+        
+        small {
+          display: block;
+          color: #666;
+          font-size: 11px;
+          margin-top: 4px;
+        }
+        
+        select, input[type="number"] {
+          width: 100%;
+          padding: 6px 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 13px;
+        }
+        
+        .slider-container {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          
+          input[type="range"] {
+            flex: 1;
+          }
+          
+          .slider-value {
+            min-width: 30px;
+            text-align: right;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+  
+  .ai-suggestions {
+    .ai-suggestions-header {
+      margin-bottom: 12px;
+      
+      .ai-generate-btn {
+        width: 100%;
+        padding: 10px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        
+        &:hover:not(:disabled) {
+          background: #0056b3;
+        }
+        
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+    
+    .ai-suggestions-list {
+      min-height: 60px;
+      
+      .ai-success {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 6px;
+        text-align: center;
+      }
+      
+      .ai-error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+      }
+      
+      .ai-no-suggestions {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+      }
+    }
+  }
+  
+  .ai-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    
+    .ai-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+    
+    span {
+      color: #666;
+      font-size: 14px;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// AI generated node styles
+.ai-generated-node {
+  .ai-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    background: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}

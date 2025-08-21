@@ -9,8 +9,9 @@ import style from '../index.css?raw'
 import katex from '../katex.css?raw'
 import { layoutSSR, renderSSRHTML } from './utils/layout-ssr'
 import { snapdom } from '@zumer/snapdom'
-import styleEditor from './plugin/styleEditor'
-import aiAssistant from './plugin/aiAssistant'
+import tabsPanel from './plugin/tabsPanel'
+import { createStyleEditorTab } from './plugin/styleEditorTab'
+import { createAIAssistantTab } from './plugin/aiAssistantTab'
 
 interface Window {
   m?: MindElixirInstance
@@ -83,14 +84,21 @@ let mind = new MindElixir(options)
 
 mind.init(example)
 
-// Initialize style editor
-styleEditor(mind)
+// Initialize tabs panel
+const tabs = tabsPanel(mind, {
+  position: { top: '20px', right: '20px' },
+  defaultTab: 'style'
+})
 
-// Initialize AI assistant
-aiAssistant(mind, {
-  enabled: true,
+// Add style editor tab
+const styleTab = createStyleEditorTab(mind)
+tabs.addTab(styleTab)
+
+// Add AI assistant tab
+const aiTab = createAIAssistantTab(mind, {
   autoSuggest: false
 })
+tabs.addTab(aiTab)
 
 function sleep() {
   return new Promise<void>(res => {

@@ -187,7 +187,7 @@ export default function (mind: MindElixirInstance, option: true | ContextMenuOpt
   edit_style.onclick = () => {
     const node = mind.currentNode
     if (node) {
-      mind.bus.fire('editStyle', node.nodeObj)
+      mind.bus.fire('openTabsPanel')
     }
     menuContainer.hidden = true
   }

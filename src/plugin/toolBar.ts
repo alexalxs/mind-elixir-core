@@ -212,8 +212,8 @@ function createToolBarLTContainer(mind: MindElixirInstance) {
   }
   aiButton.title = 'AI Assistant'
   aiButton.onclick = () => {
-    // Emit event to open AI assistant panel
-    mind.bus.fire('openAIAssistant')
+    // Emit event to open tabs panel
+    mind.bus.fire('openTabsPanel')
   }
   return toolBarLTContainer
 }

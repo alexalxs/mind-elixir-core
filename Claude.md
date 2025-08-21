@@ -60,6 +60,7 @@ Consultando o Código criei na pasta de documentações o diagarma de sequencia 
 . Sempre verifique primeiro se o processo desejado já esta em execução na porta especificada no projeto e se isso ocorre use esse processo evitando criar um novo processo ou mudar de porta;
 
 - Para testes observe:
+. Primeiro verificar se já existe teste para o componente ou api solicitada e se positivo não crie novos arquivos de teste. Se adequado faça a atualização do arquivo já existente. Evite duplicar arquivos de teste removendo arquivos duplicados.
 . Não crie arquivos de teste na raiz do projeto e sim dentro da pasta tests
 
 - Ao usar o supabase observe:

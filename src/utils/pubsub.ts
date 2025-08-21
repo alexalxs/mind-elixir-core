@@ -85,6 +85,7 @@ export type EventMap = {
   showContextMenu: (e: MouseEvent) => void
   editStyle: (node: NodeObj) => void
   openAIAssistant: () => void
+  openTabsPanel: () => void
 }
 
 export function createBus<T extends Record<string, (...args: any[]) => void> = EventMap>() {

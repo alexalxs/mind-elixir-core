@@ -35,7 +35,21 @@
       "Bash(git commit:*)",
       "Bash(git add:*)",
       "Bash(npx supabase functions deploy:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx supabase functions deploy:*)",
+      "Bash(npx supabase functions serve:*)",
+      "Bash(chmod:*)",
+      "Bash(SUPABASE_URL=https://mtugzogakhqqpykopstk.supabase.co SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10dWd6b2dha2hxcXB5a29wc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY5MzIsImV4cCI6MjA3MTIzMjkzMn0.0SypN0pLQ0TgZsWYjplh8Dp3PiXcD7tOxhPSBf9tK4U npx ts-node tests/test-ai-assistant-api.ts)",
+      "Bash(npm install:*)",
+      "Bash(SUPABASE_URL=https://mtugzogakhqqpykopstk.supabase.co SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10dWd6b2dha2hxcXB5a29wc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY5MzIsImV4cCI6MjA3MTIzMjkzMn0.0SypN0pLQ0TgZsWYjplh8Dp3PiXcD7tOxhPSBf9tK4U node test-ai-assistant-api.js)",
+      "Bash(SUPABASE_URL=https://mtugzogakhqqpykopstk.supabase.co SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10dWd6b2dha2hxcXB5a29wc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTY5MzIsImV4cCI6MjA3MTIzMjkzMn0.0SypN0pLQ0TgZsWYjplh8Dp3PiXcD7tOxhPSBf9tK4U node tests/test-ai-assistant-api.js)",
+      "Bash(npx ts-node:*)",
+      "Bash(SUPABASE_URL=https://mtugzogakhqqpykopstk.supabase.co SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10dWd6b2dha2hxcXB5a29wc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE5MzAzMzksImV4cCI6MjA0NzUwNjMzOX0.KjQBSJ7Kl9rnRyBT6k7LV7U7yJFcvHI0zH6YJrUqGnI node test-ai-assistant-api.js)",
+      "Bash(npx playwright test:*)",
+      "Bash(bash:*)",
+      "Bash(open http://localhost:23333/test-ai-expand-error.html)",
+      "Bash(npx ts-node:*)"
     ],
     "deny": []
   },

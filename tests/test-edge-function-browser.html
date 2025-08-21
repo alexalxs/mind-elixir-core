@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Edge Function AI Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .test-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .loading { background: #cce5ff; color: #004085; }
+  </style>
+</head>
+<body>
+  <h1>Teste da Edge Function AI Assistant</h1>
+  
+  <div class="test-section">
+    <div class="test-title">Configurações</div>
+    <div>
+      <strong>URL:</strong> https://mtugzogakhqqpykopstk.supabase.co/functions/v1/ai-assistant<br>
+      <strong>Anon Key:</strong> eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    </div>
+  </div>
+
+  <div class="test-section">
+    <div class="test-title">Teste 1: Requisição Válida</div>
+    <button onclick="runTest1()">Executar Teste</button>
+    <div id="result1" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <div class="test-title">Teste 2: Validação - Sem mindMap</div>
+    <button onclick="runTest2()">Executar Teste</button>
+    <div id="result2" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <div class="test-title">Teste 3: Validação - NodeData Inválido</div>
+    <button onclick="runTest3()">Executar Teste</button>
+    <div id="result3" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <div class="test-title">Teste 4: Formato de Resposta</div>
+    <button onclick="runTest4()">Executar Teste</button>
+    <div id="result4" class="result"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://mtugzogakhqqpykopstk.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10dWd6b2dha2hxcXB5a29wc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE5MzAzMzksImV4cCI6MjA0NzUwNjMzOX0.KjQBSJ7Kl9rnRyBT6k7LV7U7yJFcvHI0zH6YJrUqGnI';
+    const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/ai-assistant`;
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SUPABASE_ANON_KEY
+    };
+
+    async function callAPI(payload, resultId) {
+      const resultDiv = document.getElementById(resultId);
+      resultDiv.className = 'result loading';
+      resultDiv.textContent = 'Executando teste...';
+      
+      const startTime = Date.now();
+      
+      try {
+        const response = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload)
+        });
+        
+        const responseTime = Date.now() - startTime;
+        const data = await response.json();
+        
+        let resultText = `Status: ${response.status}\n`;
+        resultText += `Tempo: ${responseTime}ms\n\n`;
+        
+        if (response.ok) {
+          resultDiv.className = 'result success';
+          resultText += 'SUCESSO!\n\n';
+          resultText += 'Resposta:\n';
+          resultText += JSON.stringify(data, null, 2);
+          
+          // Validar estrutura da resposta
+          if (data.children) {
+            resultText += '\n\nValidação da estrutura:\n';
+            resultText += `✓ Campo "children" presente (${data.children.length} itens)\n`;
+            resultText += `✓ Campo "selectedNodeTopic": "${data.selectedNodeTopic}"\n`;
+            
+            data.children.forEach((node, i) => {
+              resultText += `\nNó ${i + 1}:\n`;
+              resultText += `  - topic: ${node.topic ? '✓' : '✗'} "${node.topic || 'FALTANDO'}"\n`;
+              resultText += `  - id: ${node.id ? '✓' : '✗'} "${node.id || 'FALTANDO'}"\n`;
+              resultText += `  - aiGenerated: ${node.aiGenerated === true ? '✓' : '✗'} ${node.aiGenerated}\n`;
+            });
+          }
+        } else {
+          resultDiv.className = 'result error';
+          resultText += 'ERRO!\n\n';
+          resultText += JSON.stringify(data, null, 2);
+        }
+        
+        resultDiv.textContent = resultText;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `Erro na requisição: ${error.message}`;
+      }
+    }
+
+    function runTest1() {
+      const payload = {
+        mindMap: {
+          nodeData: {
+            id: 'root',
+            topic: 'Inteligência Artificial',
+            children: []
+          }
+        },
+        selectedNodeId: 'root',
+        prompt: 'Gere 3 subtópicos sobre aplicações práticas de IA no dia a dia'
+      };
+      
+      callAPI(payload, 'result1');
+    }
+
+    function runTest2() {
+      const payload = {
+        selectedNodeId: 'root',
+        prompt: 'Teste sem mindMap'
+      };
+      
+      callAPI(payload, 'result2');
+    }
+
+    function runTest3() {
+      const payload = {
+        mindMap: {
+          nodeData: {
+            // Faltando id e topic
+            children: []
+          }
+        },
+        selectedNodeId: 'test',
+        prompt: 'Teste com nodeData inválido'
+      };
+      
+      callAPI(payload, 'result3');
+    }
+
+    function runTest4() {
+      const payload = {
+        mindMap: {
+          nodeData: {
+            id: 'root',
+            topic: 'Formato de Resposta',
+            children: []
+          }
+        },
+        selectedNodeId: 'root',
+        prompt: 'Responda exatamente: teste simples'
+      };
+      
+      callAPI(payload, 'result4');
+    }
+  </script>
+</body>
+</html>

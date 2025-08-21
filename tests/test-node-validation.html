@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Validação de Nós</title>
+  <script src="../dist/MindElixir.js"></script>
+  <link rel="stylesheet" href="../dist/style.css">
+  <style>
+    body { 
+      margin: 0; 
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    #map { 
+      height: 600px; 
+      width: 100%;
+      border: 1px solid #ccc;
+      margin: 20px 0;
+    }
+    .controls {
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .log {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Teste de Validação de Nós</h1>
+  
+  <div class="controls">
+    <button onclick="createProblematicMap()">Criar Mapa com Problema</button>
+    <button onclick="validateAllNodes()">Validar Todos os Nós</button>
+    <button onclick="fixAllNodes()">Corrigir Nós Problemáticos</button>
+    <button onclick="testAICall()">Testar Chamada AI</button>
+  </div>
+
+  <div id="map"></div>
+  
+  <div id="log" class="log"></div>
+
+  <script>
+    let mind = null;
+    
+    function log(message, data = null) {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      if (data) {
+        entry.textContent += '\n' + JSON.stringify(data, null, 2);
+      }
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    // Criar mapa com problemas intencionais
+    function createProblematicMap() {
+      const problematicData = {
+        nodeData: {
+          id: 'root',
+          topic: 'Mapa de Teste',
+          children: []
+        }
+      };
+      
+      // Adicionar 13 filhos para chegar ao índice 12
+      for (let i = 0; i < 13; i++) {
+        const child = {
+          id: `child-${i}`,
+          topic: `Filho ${i}`,
+          children: []
+        };
+        
+        // No índice 12, adicionar filhos problemáticos
+        if (i === 12) {
+          child.children = [
+            {
+              id: 'problem-1',
+              // topic faltando intencionalmente
+              children: [{
+                id: 'sub-problem-1',
+                topic: null // topic null
+              }]
+            },
+            {
+              id: 'problem-2',
+              topic: '', // topic vazio
+              children: [{
+                id: 'sub-problem-2',
+                // topic faltando
+              }]
+            },
+            {
+              id: 'problem-3',
+              topic: undefined, // topic undefined
+              children: [{
+                id: 'sub-problem-3',
+                topic: 0 // topic não-string
+              }]
+            }
+          ];
+        }
+        
+        problematicData.nodeData.children.push(child);
+      }
+      
+      if (mind) {
+        mind.destroy();
+      }
+      
+      mind = new MindElixir({
+        el: document.getElementById('map'),
+        data: problematicData,
+        theme: 'Fresh Green',
+        editable: true
+      });
+      
+      mind.init();
+      
+      log('Mapa problemático criado. Verifique children[12] para ver os problemas.');
+    }
+
+    // Função para validar todos os nós
+    function validateAllNodes() {
+      if (!mind) {
+        log('Por favor, crie um mapa primeiro');
+        return;
+      }
+      
+      let totalNodes = 0;
+      let problemNodes = [];
+      
+      function checkNode(node, path = 'root') {
+        totalNodes++;
+        
+        if (!node.topic || node.topic === null || node.topic === undefined || node.topic === '') {
+          problemNodes.push({
+            path: path,
+            id: node.id,
+            topic: node.topic,
+            topicType: typeof node.topic
+          });
+        }
+        
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child, index) => {
+            checkNode(child, `${path}.children[${index}]`);
+          });
+        }
+      }
+      
+      checkNode(mind.nodeData);
+      
+      log(`Total de nós: ${totalNodes}`);
+      log(`Nós problemáticos: ${problemNodes.length}`);
+      
+      if (problemNodes.length > 0) {
+        log('Detalhes dos nós problemáticos:', problemNodes);
+      }
+    }
+
+    // Função para corrigir nós
+    function fixAllNodes() {
+      if (!mind) {
+        log('Por favor, crie um mapa primeiro');
+        return;
+      }
+      
+      let fixedCount = 0;
+      
+      function fixNode(node, path = 'root') {
+        if (!node.topic || node.topic === null || node.topic === undefined || node.topic === '') {
+          node.topic = `Nó Corrigido (${node.id || path})`;
+          fixedCount++;
+          log(`Corrigido: ${path}`);
+        } else if (typeof node.topic !== 'string') {
+          node.topic = String(node.topic);
+          fixedCount++;
+          log(`Convertido para string: ${path}`);
+        }
+        
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child, index) => {
+            fixNode(child, `${path}.children[${index}]`);
+          });
+        }
+      }
+      
+      fixNode(mind.nodeData);
+      
+      log(`Total de nós corrigidos: ${fixedCount}`);
+      
+      // Atualizar visualização
+      mind.refresh();
+    }
+
+    // Testar chamada AI
+    async function testAICall() {
+      if (!mind) {
+        log('Por favor, crie um mapa primeiro');
+        return;
+      }
+      
+      // Função para limpar dados (copiada do aiAssistantTab.ts)
+      function cleanNodeData(node, depth = 0, path = 'root') {
+        if (!node || typeof node !== 'object') {
+          return null;
+        }
+        
+        let topic = '';
+        if (node.topic !== undefined && node.topic !== null) {
+          topic = String(node.topic).trim();
+          if (!topic) {
+            topic = `Node ${node.id || path}`;
+          }
+        } else {
+          topic = `Empty Node at ${path}`;
+        }
+        
+        const cleaned = {
+          id: node.id || `generated-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+          topic: topic
+        };
+        
+        if (node.children && Array.isArray(node.children) && node.children.length > 0) {
+          cleaned.children = [];
+          for (let i = 0; i < node.children.length; i++) {
+            const child = node.children[i];
+            const childPath = `${path}.children[${i}]`;
+            
+            if (!child || typeof child !== 'object') {
+              continue;
+            }
+            
+            if (!child.topic && child.topic !== '') {
+              child.topic = `Child ${i + 1}`;
+            }
+            
+            const cleanedChild = cleanNodeData(child, depth + 1, childPath);
+            if (cleanedChild !== null) {
+              cleaned.children.push(cleanedChild);
+            }
+          }
+        }
+        
+        return cleaned;
+      }
+      
+      try {
+        const cleanedData = cleanNodeData(mind.nodeData);
+        log('Dados limpos:', cleanedData);
+        
+        // Verificar especificamente children[12]
+        if (cleanedData.children && cleanedData.children[12]) {
+          log('children[12] após limpeza:', cleanedData.children[12]);
+        }
+        
+      } catch (error) {
+        log('Erro ao limpar dados: ' + error.message);
+      }
+    }
+
+    // Criar mapa inicial
+    window.onload = () => {
+      createProblematicMap();
+    };
+  </script>
+</body>
+</html>

@@ -1,13 +1,331 @@
-.ai-assistant-panel {
+// Integrated Editor Panel
+.integrated-editor-panel {
   position: fixed;
   top: 20px;
-  left: 20px;
-  width: 320px;
+  right: 20px;
+  width: 380px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 9999;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f5f5f5;
+    border-radius: 8px 8px 0 0;
+    
+    .editor-tabs {
+      display: flex;
+      flex: 1;
+      
+      .tab-btn {
+        background: none;
+        border: none;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        
+        &:hover {
+          color: #333;
+          background: rgba(0, 0, 0, 0.02);
+        }
+        
+        &.active {
+          color: #4CAF50;
+          border-bottom-color: #4CAF50;
+          background: white;
+        }
+      }
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #666;
+      cursor: pointer;
+      padding: 0 16px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+  
+  .editor-content {
+    .tab-content {
+      display: none;
+      
+      &.active {
+        display: block;
+      }
+    }
+  }
+}
+
+// AI Assistant specific styles within integrated panel
+.ai-assistant-content {
+  padding: 16px;
+  
+  .ai-current-node {
+    margin-bottom: 16px;
+    
+    label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    .ai-node-topic {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      display: block;
+      padding: 8px;
+      background: #f8f8f8;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  
+  .ai-prompt-section {
+    margin-bottom: 16px;
+    
+    label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      box-sizing: border-box;
+      
+      &:focus {
+        outline: none;
+        border-color: #4CAF50;
+      }
+    }
+  }
+  
+  .ai-config-section {
+    margin-bottom: 16px;
+    
+    .config-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      cursor: pointer;
+      
+      label {
+        font-size: 12px;
+        color: #666;
+        font-weight: 500;
+      }
+      
+      .toggle-config-btn {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 4px;
+      }
+    }
+    
+    .config-content {
+      padding: 12px;
+      background: #f8f8f8;
+      border-radius: 4px;
+      
+      .config-group {
+        margin-bottom: 12px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        label {
+          display: block;
+          font-size: 12px;
+          color: #666;
+          margin-bottom: 4px;
+        }
+        
+        select, input[type="number"] {
+          width: 100%;
+          padding: 6px 8px;
+          border: 1px solid #e0e0e0;
+          border-radius: 4px;
+          font-size: 13px;
+          background: white;
+          box-sizing: border-box;
+          
+          &:focus {
+            outline: none;
+            border-color: #4CAF50;
+          }
+        }
+        
+        .slider-container {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            outline: none;
+            
+            &::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              width: 16px;
+              height: 16px;
+              background: #4CAF50;
+              border-radius: 50%;
+              cursor: pointer;
+            }
+            
+            &::-moz-range-thumb {
+              width: 16px;
+              height: 16px;
+              background: #4CAF50;
+              border-radius: 50%;
+              cursor: pointer;
+              border: none;
+            }
+          }
+          
+          .slider-value {
+            font-size: 12px;
+            color: #333;
+            min-width: 30px;
+            text-align: right;
+          }
+        }
+        
+        small {
+          display: block;
+          font-size: 11px;
+          color: #999;
+          margin-top: 2px;
+        }
+      }
+    }
+  }
+  
+  .ai-suggestions {
+    .ai-suggestions-header {
+      margin-bottom: 12px;
+      
+      .ai-generate-btn {
+        width: 100%;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover:not(:disabled) {
+          background: #45a049;
+        }
+        
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+    
+    .ai-suggestions-list {
+      max-height: 200px;
+      overflow-y: auto;
+      
+      .ai-success {
+        color: #4caf50;
+        padding: 15px;
+        text-align: center;
+        font-size: 14px;
+        background-color: #e8f5e9;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-weight: 500;
+      }
+      
+      .ai-error {
+        color: #f44336;
+        padding: 15px;
+        text-align: center;
+        font-size: 13px;
+        background: #ffebee;
+        border-radius: 4px;
+      }
+      
+      .ai-no-suggestions {
+        text-align: center;
+        padding: 16px;
+        font-size: 13px;
+        color: #666;
+      }
+    }
+  }
+  
+  .ai-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    
+    .ai-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4CAF50;
+      border-radius: 50%;
+      animation: ai-spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+    
+    span {
+      font-size: 13px;
+      color: #666;
+    }
+  }
   
   .ai-assistant-header {
     display: flex;
@@ -119,6 +437,14 @@
     .ai-custom-prompt {
       margin-bottom: 16px;
       
+      label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      
       textarea {
         width: 100%;
         padding: 8px;
@@ -128,11 +454,19 @@
         resize: vertical;
         min-height: 60px;
         font-family: inherit;
+        margin-bottom: 4px;
         
         &:focus {
           outline: none;
           border-color: #4CAF50;
         }
+      }
+      
+      small {
+        display: block;
+        font-size: 11px;
+        color: #999;
+        font-style: italic;
       }
     }
     
@@ -314,6 +648,18 @@
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     z-index: 10;
+  }
+}
+
+// Style editor message when not loaded
+.style-editor-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  
+  p {
+    margin: 0;
   }
 }
 

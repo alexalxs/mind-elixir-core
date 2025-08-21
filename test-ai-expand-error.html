@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test AI Expand Error</title>
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+      border: 1px solid #ccc;
+    }
+    #test-controls {
+      margin: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      background: #f5f5f5;
+    }
+    #log {
+      margin: 20px;
+      padding: 10px;
+      border: 1px solid #999;
+      background: #fff;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .error { color: red; }
+    .success { color: green; }
+    .info { color: blue; }
+  </style>
+</head>
+<body>
+  <h1>AI Assistant - Expand Error Test</h1>
+  
+  <div id="test-controls">
+    <h2>Test Controls</h2>
+    <button id="btn-simulate-ai">1. Simulate AI Generation</button>
+    <button id="btn-check-expand">2. Check Node Expansion</button>
+    <button id="btn-force-expand">3. Force Expand</button>
+    <button id="btn-refresh-map">4. Refresh Map</button>
+    <button id="btn-clear-log">Clear Log</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div id="map"></div>
+  
+  <div id="log">Test log will appear here...</div>
+
+  <script type="module">
+    import MindElixir from './src/index.ts'
+    import example from './src/example.ts'
+    import aiAssistant from './src/plugin/aiAssistant.ts'
+
+    const log = (message, type = 'info') => {
+      const logEl = document.getElementById('log')
+      const timestamp = new Date().toLocaleTimeString()
+      const colorClass = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'
+      logEl.innerHTML += `<span class="${colorClass}">[${timestamp}] ${message}</span>\n`
+      logEl.scrollTop = logEl.scrollHeight
+    }
+
+    const setStatus = (message, type = 'info') => {
+      const statusEl = document.getElementById('status')
+      statusEl.className = `status ${type}`
+      statusEl.textContent = message
+    }
+
+    // Initialize Mind Elixir
+    const options = {
+      el: '#map',
+      direction: MindElixir.SIDE,
+      data: example,
+      contextMenu: true,
+      toolBar: true,
+      keypress: true,
+      allowUndo: true,
+      before: {
+        insertSibling: (el, obj) => true,
+        async addChild: (el, obj) => {
+          await sleep(100)
+          return true
+        },
+      },
+      primaryLinkStyle: 2,
+      primaryNodeVerticalGap: 15,
+      primaryNodeHorizontalGap: 15,
+    }
+
+    const mind = new MindElixir(options)
+    window.mind = mind // Make it globally accessible for debugging
+    
+    // Initialize AI Assistant
+    mind.install(aiAssistant)
+    mind.init()
+
+    log('Mind Elixir initialized', 'success')
+
+    // Test functions
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+    // Find node by topic
+    const findNodeByTopic = (topic) => {
+      const findInNode = (node) => {
+        if (node.topic === topic) return node
+        if (node.children) {
+          for (const child of node.children) {
+            const found = findInNode(child)
+            if (found) return found
+          }
+        }
+        return null
+      }
+      return findInNode(mind.nodeData)
+    }
+
+    // 1. Simulate AI Generation
+    document.getElementById('btn-simulate-ai').addEventListener('click', async () => {
+      log('Starting AI generation simulation...')
+      
+      // Select "mind-elixir-react" node
+      const targetNode = findNodeByTopic('mind-elixir-react')
+      if (!targetNode) {
+        log('Target node "mind-elixir-react" not found!', 'error')
+        setStatus('Target node not found', 'error')
+        return
+      }
+      
+      log(`Found target node: ${targetNode.topic} (id: ${targetNode.id})`)
+      
+      // Simulate AI-generated children
+      const aiChildren = [
+        { topic: 'Component Architecture', aiGenerated: true },
+        { topic: 'State Management', aiGenerated: true },
+        { topic: 'Hooks Integration', aiGenerated: true }
+      ]
+      
+      // Clear existing children (if any)
+      targetNode.children = []
+      
+      // Add AI nodes
+      aiChildren.forEach(childData => {
+        const newNode = mind.generateNewObj()
+        newNode.topic = childData.topic
+        newNode.aiGenerated = true
+        newNode.parent = targetNode
+        
+        if (!targetNode.children) {
+          targetNode.children = []
+        }
+        targetNode.children.push(newNode)
+        
+        log(`Added AI node: ${newNode.topic} (id: ${newNode.id})`)
+      })
+      
+      // Mark node as expanded
+      targetNode.expanded = true
+      log(`Set expanded=true for node: ${targetNode.topic}`)
+      
+      // Refresh the map
+      mind.refresh()
+      log('Map refreshed')
+      
+      setStatus('AI nodes added successfully', 'success')
+      
+      // Check DOM after a delay
+      await sleep(500)
+      checkNodeExpansion()
+    })
+
+    // 2. Check Node Expansion
+    const checkNodeExpansion = () => {
+      log('\nChecking node expansion state...')
+      
+      const targetNode = findNodeByTopic('mind-elixir-react')
+      if (!targetNode) {
+        log('Target node not found in data structure', 'error')
+        return
+      }
+      
+      // Check data structure
+      log(`Data structure:`)
+      log(`  - Node: ${targetNode.topic}`)
+      log(`  - Expanded: ${targetNode.expanded}`)
+      log(`  - Children count: ${targetNode.children ? targetNode.children.length : 0}`)
+      
+      if (targetNode.children) {
+        targetNode.children.forEach((child, i) => {
+          log(`    - Child ${i}: ${child.topic} (AI: ${child.aiGenerated || false})`)
+        })
+      }
+      
+      // Check DOM
+      const nodeEl = mind.findEle(targetNode.id)
+      if (!nodeEl) {
+        log('Node element not found in DOM!', 'error')
+        return
+      }
+      
+      log(`\nDOM state:`)
+      log(`  - Node element found: ${nodeEl.tagName}`)
+      
+      const wrapper = nodeEl.closest('me-wrapper')
+      if (!wrapper) {
+        log('  - Wrapper not found!', 'error')
+        return
+      }
+      
+      // Check expander
+      const expander = wrapper.querySelector('me-expander')
+      if (expander) {
+        const isExpanded = expander.classList.contains('minus')
+        log(`  - Expander state: ${isExpanded ? 'expanded (minus)' : 'collapsed'}`)
+      } else {
+        log('  - Expander not found!', 'error')
+      }
+      
+      // Check for children container
+      const parentElement = wrapper.parentElement
+      const childrenContainer = parentElement?.querySelector('me-nodes')
+      
+      if (childrenContainer) {
+        const visibleChildren = childrenContainer.querySelectorAll('me-tpc')
+        log(`  - Children container found`)
+        log(`  - Visible children: ${visibleChildren.length}`)
+        
+        visibleChildren.forEach((child, i) => {
+          const childWrapper = child.closest('me-wrapper')
+          const childNode = childWrapper?.querySelector('me-tpc')
+          const topic = childNode?.textContent || 'Unknown'
+          log(`    - Visible child ${i}: ${topic}`)
+        })
+      } else {
+        log('  - Children container NOT found!', 'error')
+        log('  - This means children are not rendered in DOM')
+      }
+      
+      // Diagnosis
+      if (targetNode.expanded && targetNode.children && targetNode.children.length > 0) {
+        if (!childrenContainer || childrenContainer.querySelectorAll('me-tpc').length === 0) {
+          log('\n🔴 PROBLEM IDENTIFIED: Node is expanded in data but children not visible in DOM', 'error')
+          setStatus('Expansion error detected', 'error')
+        } else {
+          log('\n✅ Node properly expanded with visible children', 'success')
+          setStatus('Node properly expanded', 'success')
+        }
+      }
+    }
+    
+    document.getElementById('btn-check-expand').addEventListener('click', checkNodeExpansion)
+
+    // 3. Force Expand
+    document.getElementById('btn-force-expand').addEventListener('click', () => {
+      log('\nForcing node expansion...')
+      
+      const targetNode = findNodeByTopic('mind-elixir-react')
+      if (!targetNode) {
+        log('Target node not found', 'error')
+        return
+      }
+      
+      const nodeEl = mind.findEle(targetNode.id)
+      if (!nodeEl) {
+        log('Node element not found', 'error')
+        return
+      }
+      
+      // Try calling expandNode directly
+      log('Calling mind.expandNode...')
+      mind.expandNode(nodeEl, true)
+      
+      setStatus('Forced expansion attempted', 'info')
+      
+      // Check again after a delay
+      setTimeout(checkNodeExpansion, 500)
+    })
+
+    // 4. Refresh Map
+    document.getElementById('btn-refresh-map').addEventListener('click', () => {
+      log('\nRefreshing map...')
+      mind.refresh()
+      log('Map refreshed')
+      setStatus('Map refreshed', 'info')
+      
+      // Check state after refresh
+      setTimeout(checkNodeExpansion, 500)
+    })
+
+    // Clear Log
+    document.getElementById('btn-clear-log').addEventListener('click', () => {
+      document.getElementById('log').innerHTML = ''
+      setStatus('Log cleared', 'info')
+    })
+
+    // Initial check
+    setTimeout(() => {
+      log('\n=== Initial State ===')
+      checkNodeExpansion()
+    }, 1000)
+  </script>
+</body>
+</html>
